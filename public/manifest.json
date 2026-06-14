@@ -1,0 +1,15 @@
+{
+  "name": "Daniel Anthony S. Estrella — Backend Engineer",
+  "short_name": "Daniel Estrella",
+  "description": "Portfolio of Daniel Anthony S. Estrella, backend engineer and Magna Cum Laude graduate.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafaf8",
+  "theme_color": "#b08d5b",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any"
+    }
+  ]
+}

@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daniel Anthony S. Estrella — Resume</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ═══════════════════════════════════
+   GLOBALS — variables, reset, body
+════════════════════════════════════ */
+
+    @font-face {
+      font-family: 'Avenir Next LT Pro';
+      src: local('Avenir Next LT Pro'), local('AvenirNextLTPro-Regular');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Avenir Next LT Pro';
+      src: local('Avenir Next LT Pro Demi'), local('AvenirNextLTPro-Demi');
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Avenir Next LT Pro Light';
+      src: local('Avenir Next LT Pro Light'), local('AvenirNextLTPro-Light');
+      font-weight: 300;
+      font-style: normal;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --black: #111110;
+      --gray-dark: #3a3a38;
+      --gray-mid: #7a7a76;
+      --gray-light: #c8c8c4;
+      --gray-rule: #e0e0dc;
+      --accent: #b08d5b;
+      --white: #fafaf8;
+      --font-main: 'Avenir Next LT Pro', 'Avenir Next', 'Avenir', 'Century Gothic', sans-serif;
+      --font-light: 'Avenir Next LT Pro Light', 'Avenir Next', 'Avenir', 'Century Gothic', sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 14px;
+      --space-lg: 22px;
+      --space-xl: 28px;
+    }
+
+    html {
+      background: #f0f0ec;
+    }
+
+    body {
+      font-family: var(--font-light);
+      font-weight: 300;
+      background: var(--white);
+      color: var(--black);
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 52px 56px;
+      font-size: 11px;
+      line-height: 1.55;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ═══════════════════════════════════
+     HEADER
+  ════════════════════════════════════ */
+
+    .header {
+      margin-bottom: var(--space-xl);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1.5px solid var(--black);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .name {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 26px;
+      letter-spacing: 0.04em;
+      color: var(--black);
+      line-height: 1;
+    }
+
+    .name-sub {
+      font-family: var(--font-light);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--gray-mid);
+      margin-top: 5px;
+    }
+
+    .contact-block {
+      text-align: right;
+    }
+
+    .contact-block p {
+      font-size: 10px;
+      color: var(--gray-dark);
+      line-height: 1.7;
+      letter-spacing: 0.02em;
+    }
+
+    .contact-block a {
+      color: var(--gray-dark);
+      text-decoration: none;
+    }
+
+    .summary {
+      font-size: 11px;
+      color: var(--gray-dark);
+      line-height: 1.65;
+      max-width: 88%;
+    }
+
+    /* ═══════════════════════════════════
+     SECTION SHELL — label + rule
+  ════════════════════════════════════ */
+
+    .section {
+      margin-bottom: var(--space-lg);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-label {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 8.5px;
+      letter-spacing: 0.22em;
+      color: var(--gray-mid);
+      white-space: nowrap;
+    }
+
+    .section-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--black);
+    }
+
+    /* ═══════════════════════════════════
+     EXPERIENCE
+  ════════════════════════════════════ */
+
+    /* entry-header pattern: flex row, space-between, baseline, bottom rule */
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--black);
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+
+    .exp-company {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .exp-right {
+      text-align: right;
+    }
+
+    .exp-role {
+      font-family: var(--font-light);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--gray-dark);
+    }
+
+    .exp-date {
+      font-family: var(--font-light);
+      font-size: 9.5px;
+      color: var(--gray-mid);
+      margin-top: 1px;
+    }
+
+    /* ── Integrated Project Card ─────────────────────────────
+     Sits inside experience entry — more compact, no border
+  ─────────────────────────────────────────────────────── */
+    .exp-proj-card {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 16px;
+      border-left: 3px solid var(--accent);
+      background: #f5f5f1;
+      border-radius: 0 5px 5px 0;
+      padding: 10px 14px 10px 12px;
+      margin-bottom: var(--space-lg);
+    }
+
+    .exp-proj-left {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .exp-proj-kicker {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 7.5px;
+      letter-spacing: 0.20em;
+      color: var(--accent);
+    }
+
+    .exp-proj-name {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 17px;
+      color: #1a5c52;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .exp-proj-link {
+      font-family: var(--font-main);
+      font-size: 8px;
+      color: var(--gray-mid);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 3px;
+      padding: 3px 7px;
+      transition: border-color 0.15s, color 0.15s;
+      align-self: flex-start;
+    }
+
+    .exp-proj-link i {
+      color: var(--accent);
+      font-size: 7.5px;
+    }
+
+    .exp-proj-link:hover {
+      border-color: var(--accent);
+      color: var(--gray-dark);
+    }
+
+    .exp-proj-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .exp-proj-desc {
+      font-size: 10.5px;
+      color: var(--gray-dark);
+      line-height: 1.55;
+    }
+
+    .exp-proj-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    /* entry-header pattern: flex row, space-between, baseline, bottom rule */
+    .intern-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 0.5px solid var(--gray-rule);
+      padding-bottom: var(--space-xs);
+      margin-bottom: var(--space-sm);
+    }
+
+    .intern-date {
+      font-size: 9.5px;
+      color: var(--gray-mid);
+    }
+
+    /* ═══════════════════════════════════
+     BULLETS
+  ════════════════════════════════════ */
+
+    .bullets {
+      margin-bottom: 10px;
+    }
+
+    /* row pattern: numbered index left, content right, bottom rule */
+    .bullet-row {
+      display: flex;
+      gap: 10px;
+      padding: 4.5px 0;
+      border-bottom: 0.5px solid var(--gray-rule);
+    }
+
+    /* border-top removed — header's own bottom border already separates header from bullets */
+    .bnum {
+      font-family: var(--font-main);
+      font-size: 8px;
+      color: var(--gray-light);
+      min-width: 14px;
+      padding-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .btext {
+      font-size: 11px;
+      color: var(--gray-dark);
+      line-height: 1.5;
+    }
+
+    .btext strong {
+      font-family: var(--font-main);
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    /* No bar below the last bullet in any bullets section */
+    .bullets>.last-bullet {
+      border-bottom: none;
+    }
+
+    /* ═══════════════════════════════════
+     PROJECT CARD
+  ════════════════════════════════════ */
+
+    .proj-block {
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 5px;
+      background: #f5f5f1;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .proj-header {
+      background: #f5ede0;
+      border-bottom: 0.5px solid var(--gray-rule);
+      border-left: 3px solid var(--accent);
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .proj-kicker {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 8px;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .proj-divider {
+      width: 0.5px;
+      height: 11px;
+      background: var(--gray-rule);
+      flex-shrink: 0;
+    }
+
+    .proj-name {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--black);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .proj-link {
+      font-family: var(--font-main);
+      font-size: 8px;
+      color: var(--gray-mid);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: auto;
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 3px;
+      padding: 3px 7px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .proj-link i {
+      color: var(--accent);
+      font-size: 7.5px;
+      flex-shrink: 0;
+    }
+
+    .proj-link:hover {
+      border-color: var(--accent);
+      color: var(--gray-dark);
+    }
+
+    .proj-body {
+      padding: 9px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .proj-desc {
+      font-size: 10.5px;
+      color: var(--gray-dark);
+      line-height: 1.55;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .tag {
+      font-family: var(--font-main);
+      font-size: 8.5px;
+      border: 0.5px solid var(--gray-light);
+      border-radius: 3px;
+      padding: 2px 6px;
+      color: var(--gray-mid);
+      letter-spacing: 0.04em;
+    }
+
+    /* ═══════════════════════════════════
+     TECHNICAL & ADDITIONAL SKILLS
+  ════════════════════════════════════ */
+
+    .skills-band {
+      display: flex;
+      flex-direction: column;
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: var(--space-md);
+    }
+
+    .skills-band:last-child {
+      margin-bottom: 0;
+    }
+
+    .skill-row {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      border-bottom: 0.5px solid #f0f0ec;
+    }
+
+    .skill-row:last-child {
+      border-bottom: none;
+    }
+
+    .skill-row-label {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 7.5px;
+      letter-spacing: 0.14em;
+      color: var(--gray-mid);
+      text-transform: uppercase;
+      padding: 6px 10px;
+      background: #f5f5f1;
+      border-right: 0.5px solid var(--gray-rule);
+      display: flex;
+      align-items: center;
+    }
+
+    .skill-row-items {
+      padding: 5px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .skill-pill {
+      font-family: var(--font-main);
+      font-size: 8px;
+      background: #f0f0ec;
+      border-radius: 3px;
+      padding: 2px 6px;
+      color: var(--gray-dark);
+    }
+
+    /* ═══════════════════════════════════
+     LICENSES & CERTIFICATIONS
+  ════════════════════════════════════ */
+
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 20px;
+    }
+
+    /* row pattern: numbered index left, content right, bottom rule */
+    .cert-row {
+      display: flex;
+      gap: var(--space-sm);
+      padding: 5px 0;
+      border-bottom: 0.5px solid var(--gray-rule);
+    }
+
+    .cert-row:first-child,
+    .cert-row:nth-child(2) {
+      border-top: 0.5px solid var(--gray-rule);
+    }
+
+    .cert-num {
+      font-size: 8px;
+      color: var(--gray-light);
+      min-width: 14px;
+      padding-top: 1px;
+    }
+
+    .cert-name {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 10px;
+      color: var(--black);
+      line-height: 1.4;
+    }
+
+    .cert-issuer {
+      font-size: 9.5px;
+      color: var(--gray-mid);
+    }
+
+    .cert-issuer-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .cert-issuer-dot {
+      font-size: 8px;
+      color: var(--gray-light);
+    }
+
+    .cred-text-link {
+      font-size: 9px;
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      border-bottom: 0.5px solid var(--accent);
+      transition: border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .cred-text-link i {
+      font-size: 8px;
+    }
+
+    .cred-text-link:hover {
+      border-color: var(--accent);
+    }
+
+    /* ═══════════════════════════════════
+     EDUCATION
+  ════════════════════════════════════ */
+
+    .edu-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .edu-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 5px;
+      border-bottom: 0.5px solid var(--gray-rule);
+      margin-bottom: 2px;
+    }
+
+    .edu-school {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--black);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .edu-year {
+      font-size: 9px;
+      color: var(--gray-mid);
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+    }
+
+    .edu-mid-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+
+    .edu-degree {
+      font-size: 10.5px;
+      color: var(--gray-dark);
+    }
+
+    .edu-honors {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .honor-detail {
+      font-size: 9px;
+      color: var(--gray-mid);
+      margin-bottom: 8px;
+    }
+
+    .edu-awards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .award-pill {
+      font-size: 8px;
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 3px;
+      padding: 2px 7px;
+      color: var(--gray-mid);
+      letter-spacing: 0.02em;
+    }
+
+    /* ═══════════════════════════════════
+     SECONDARY EDUCATION CARD
+  ════════════════════════════════════ */
+
+    .shs-card {
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 5px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .shs-card-header {
+      background: #f5f5f1;
+      border-bottom: 0.5px solid var(--gray-rule);
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .shs-badge {
+      font-family: var(--font-main);
+      font-size: 6px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: #fff;
+      color: var(--gray-mid);
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 2px;
+      padding: 1px 5px;
+      white-space: nowrap;
+    }
+
+    .shs-card-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      gap: 12px;
+    }
+
+    .shs-school {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .shs-strand {
+      font-size: 9.5px;
+      color: var(--gray-dark);
+      margin-top: 1px;
+    }
+
+    .shs-year {
+      font-size: 8.5px;
+      color: var(--gray-mid);
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: 0.04em;
+    }
+
+    /* ═══════════════════════════════════
+     ACADEMIC PROJECTS — Option B grid
+  ════════════════════════════════════ */
+
+    .acad-grid {
+      display: grid;
+      grid-template-columns: 1fr 170px;
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .acad-left {
+      padding: 10px 12px;
+      border-right: 0.5px solid var(--gray-rule);
+    }
+
+    .acad-kicker {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 7px;
+      letter-spacing: 0.20em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .acad-name {
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--black);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .acad-desc {
+      font-size: 10.5px;
+      color: var(--gray-dark);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .acad-right {
+      padding: 10px 10px;
+      background: #f5f5f1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .acad-date {
+      font-size: 9px;
+      color: var(--gray-mid);
+    }
+
+    .acad-links {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .acad-links-row {
+      display: flex;
+      gap: 3px;
+    }
+
+    .acad-links-row .acad-link {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .acad-link {
+      font-family: var(--font-main);
+      font-size: 8px;
+      color: var(--gray-mid);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 3px;
+      padding: 3px 7px;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      transition: border-color 0.15s, color 0.15s;
+      width: 100%;
+    }
+
+    .acad-link i {
+      color: var(--accent);
+      font-size: 7.5px;
+      flex-shrink: 0;
+    }
+
+    .acad-link:hover {
+      border-color: var(--accent);
+      color: var(--gray-dark);
+    }
+
+    .acad-link-center {
+      justify-content: center;
+    }
+
+    .acad-link-center {
+      justify-content: center;
+    }
+
+    /* ── Stat sidebar (Hotel Booking card) ── */
+    .acad-stat-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .acad-stat-label {
+      font-family: var(--font-main);
+      font-size: 7px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gray-mid);
+    }
+
+    .acad-stat-val {
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--black);
+    }
+
+    .acad-stat-divider {
+      height: 0.5px;
+      background: var(--gray-rule);
+    }
+
+    /* ═══════════════════════════════════
+     CREDENTIALS TABLE — Option C
+  ════════════════════════════════════ */
+
+    .creds-table {
+      border: 0.5px solid var(--gray-rule);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .creds-table-header {
+      background: #f5f5f1;
+      padding: 4px 10px;
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 7.5px;
+      letter-spacing: 0.16em;
+      color: var(--gray-mid);
+      text-transform: uppercase;
+      border-bottom: 0.5px solid var(--gray-rule);
+    }
+
+    .creds-table-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 10px;
+      border-bottom: 0.5px solid #f0f0ec;
+      gap: 8px;
+    }
+
+    .creds-table-row:last-child {
+      border-bottom: none;
+    }
+
+    .creds-table-key {
+      font-family: var(--font-main);
+      font-size: 8px;
+      color: var(--gray-mid);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .creds-table-val {
+      font-family: 'Consolas', monospace;
+      font-size: 9px;
+      color: var(--black);
+      letter-spacing: 0.03em;
+      text-align: right;
+    }
+
+    /* ═══════════════════════════════════
+     PRINT MODE TOGGLE UI — screen only
+  ════════════════════════════════════ */
+
+    .print-controls {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 9999;
+    }
+
+    .print-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-rule);
+      background: rgba(250, 250, 248, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--gray-dark);
+    }
+
+    .print-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: scale(1.05);
+    }
+
+    .print-toggle i {
+      font-size: 14px;
+    }
+
+    .print-panel {
+      position: absolute;
+      top: 44px;
+      right: 0;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      background: rgba(250, 250, 248, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--gray-rule);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      min-width: 160px;
+    }
+
+    .print-panel.open {
+      display: flex;
+    }
+
+    .print-btn {
+      font-family: var(--font-main);
+      font-size: 8px;
+      letter-spacing: 0.06em;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--gray-rule);
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--gray-dark);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .print-btn i {
+      font-size: 10px;
+      width: 14px;
+      text-align: center;
+    }
+
+    .print-btn:hover {
+      border-color: var(--accent);
+      color: var(--black);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .print-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .print-btn-action {
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+      justify-content: center;
+    }
+
+    .print-btn-action:hover {
+      background: var(--gray-dark);
+      border-color: var(--gray-dark);
+      color: var(--white);
+    }
+
+    .print-modes {
+      display: flex;
+      gap: 4px;
+    }
+
+    /* ═══════════════════════════════════
+     PRINT & RESPONSIVE
+  ════════════════════════════════════ */
+
+    @media print {
+
+      *,
+      *::before,
+      *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      html {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      body {
+        width: 180mm !important;
+        max-width: 180mm !important;
+        margin: 0 !important;
+        /* No body padding in print — @page margins handle all four edges
+         on EVERY page, not just the first/last. */
+        padding: 0 0 0 0 !important;
+        padding-top: 0 !important;
+        padding-right: 0 !important;
+        padding-bottom: 0 !important;
+        padding-left: 0 !important;
+        background: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      @page {
+        size: A4;
+        /* 15mm ≈ 56px at 96dpi — matches the screen body padding so the
+         PDF looks identical to the HTML preview */
+        margin: 14mm 15mm;
+      }
+
+      /* ── Page-break controls ───────────────────────────────────
+       Keep all major blocks intact; never let a header strand
+       alone at the bottom of a page.
+    ─────────────────────────────────────────────────────────── */
+
+      /* Section headers always stay with the content below them */
+      .section-header,
+      .exp-header,
+      .intern-header {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      /* Allow large sections to flow naturally across pages.
+       Only small atomic blocks are protected from splitting.   */
+      .bullet-row,
+      .proj-block,
+      .cert-row,
+      .edu-block,
+      .acad-block {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      /* Remove forced page break & double padding on Licenses.
+       Let content flow naturally; @page margin already covers it */
+      .licenses-section {
+        break-before: auto;
+        page-break-before: auto;
+        padding-top: 0;
+      }
+
+      /* Improve text flow — avoid single-line orphans */
+      .btext,
+      .proj-desc,
+      .acad-desc,
+      .summary {
+        orphans: 3;
+        widows: 3;
+      }
+
+      /* ── Single-canvas mode overrides ─────────────────────────
+       When body has .single-canvas, cancel ALL break rules so
+       everything flows onto one continuous page.
+    ─────────────────────────────────────────────────────────── */
+      body.single-canvas .licenses-section {
+        break-before: auto !important;
+        page-break-before: auto !important;
+        padding-top: 0 !important;
+      }
+
+      body.single-canvas .section-header,
+      body.single-canvas .exp-header,
+      body.single-canvas .intern-header {
+        break-after: auto !important;
+        page-break-after: auto !important;
+      }
+
+      body.single-canvas .bullet-row,
+      body.single-canvas .proj-block,
+      body.single-canvas .cert-row,
+      body.single-canvas .edu-block,
+      body.single-canvas .acad-block {
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+      }
+
+      /* Hide the toggle UI when printing */
+      .print-controls {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 28px 20px;
+      }
+
+      .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .certs-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .proj-block {
+        grid-template-columns: 1fr;
+      }
+
+      .proj-left {
+        border-right: none;
+        border-bottom: 0.5px solid var(--gray-rule);
+        padding-right: 0;
+        padding-bottom: var(--space-sm);
+      }
+
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+      }
+
+      .contact-block {
+        text-align: left;
+      }
+
+      .edu-block {
+        grid-template-columns: 1fr;
+      }
+
+      .edu-right {
+        border-left: none;
+        border-top: 0.5px solid var(--gray-rule);
+        padding-left: 0;
+        padding-top: var(--space-sm);
+        margin-top: var(--space-sm);
+      }
+    }
+  </style>
+  <!-- Dynamic @page size injected by JS for single-canvas mode -->
+  <style id="dynamic-page-size"></style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div>
+        <p class="name">Daniel Anthony S. Estrella</p>
+        <p class="name-sub">SOFTWARE DEVELOPMENT · BACKEND ENGINEER</p>
+      </div>
+      <div class="contact-block">
+        <p>+63 962 827 1366</p>
+        <p><a href="mailto:daniel.anth.est.03@gmail.com">daniel.anth.est.03@gmail.com</a></p>
+        <p>Meycauayan City, Bulacan</p>
+        <p><a href="https://linkedin.com/in/daniel-est">linkedin.com/in/daniel-est</a> · <a
+            href="https://github.com/danielEst-dev">github.com/danielEst-dev</a></p>
+      </div>
+    </div>
+    <p class="summary">Magna Cum Laude BS Information Technology graduate and backend developer with professional experience building production-grade microservice architectures using ASP.NET Core (C#). Independently developed 130+ RESTful API endpoints across 7 microservice repositories within a live commercial product. Proficient in .NET Core, Node.js, Express.js, PostgreSQL, MariaDB, and Redis, with working knowledge of React and Next.js. Experienced in Agile/Scrum workflows, Git, and relational database schema design. Oracle Cloud 2025 Certified Developer Professional.</p>
+  </header>
+
+  <!-- PROFESSIONAL EXPERIENCE -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">PROFESSIONAL EXPERIENCE</span>
+      <div class="section-rule"></div>
+    </div>
+
+    <!-- Xentra Full-time -->
+    <div class="exp-header">
+      <p class="exp-company">Xentra Solutions, Inc.</p>
+      <div class="exp-right">
+        <p class="exp-role">JUNIOR BACKEND DEVELOPER</p>
+        <p class="exp-date">September 2025 — Present</p>
+      </div>
+    </div>
+
+    <div class="bullets">
+      <div class="bullet-row"><span class="bnum">01</span>
+        <p class="btext">Led backend development for an upcoming product version, building over <strong>130 RESTful
+            API</strong> endpoints across the microservice ecosystem within <strong>1.5 months</strong>.</p>
+      </div>
+      <div class="bullet-row"><span class="bnum">02</span>
+        <p class="btext">Manages <strong>7 microservice Git repositories</strong>, overseeing branch strategy, code
+          integration, version control practices, and interservice RESTful API communication patterns.</p>
+      </div>
+      <div class="bullet-row"><span class="bnum">03</span>
+        <p class="btext">Translates Figma designs into backend specifications and API contracts, deriving and confirming
+          <strong>130+</strong> endpoint definitions and response shapes in coordination with client-side developers.
+        </p>
+      </div>
+      <div class="bullet-row"><span class="bnum">04</span>
+        <p class="btext">Coordinates with 4 client-side developers (2 Next.js, 2 mobile) to align API response shapes
+          and payload structures, and collaborates with 2 QA testers to investigate and resolve backend bugs.</p>
+      </div>
+      <div class="bullet-row"><span class="bnum">05</span>
+        <p class="btext">Designs and maintains dedicated relational database schemas per microservice, creating
+          <strong>10+ tables</strong> and modifying 7 existing ones to support new features aligned with client
+          requirements.
+        </p>
+      </div>
+      <div class="bullet-row last-bullet"><span class="bnum">06</span>
+        <p class="btext">Participates in Agile ceremonies including daily standups, managing tasks across Scrum and
+          Kanban workflows in JIRA for sprint planning and progress tracking.</p>
+      </div>
+    </div>
+
+    <!-- BrewBank Project Card -->
+    <div class="proj-block">
+      <div class="proj-header">
+        <span class="proj-kicker">KEY PROJECT</span>
+        <span class="proj-divider"></span>
+        <span class="proj-name">BREWBANK</span>
+        <a href="https://brewbank.app" class="proj-link"><i class="fa-solid fa-globe"></i> brewbank.app</a>
+      </div>
+      <div class="proj-body">
+        <p class="proj-desc">Contributed to the backend microservice architecture of BrewBank — a prepaid coffee loyalty
+          platform for Australian cafés — focusing on core transaction and redemption API workflows using ASP.NET Core
+          and MariaDB.</p>
+        <div class="tags">
+          <span class="tag">ASP.NET Core (C#)</span>
+          <span class="tag">REST APIs</span>
+          <span class="tag">Microservices</span>
+          <span class="tag">MariaDB</span>
+          <span class="tag">JIRA / Agile</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intern -->
+    <div class="intern-header">
+      <p class="exp-role">BACKEND DEVELOPER INTERN</p>
+      <p class="intern-date">January 2025 — May 2025 · 500+ hours</p>
+    </div>
+    <div class="bullets intern-bullets">
+      <div class="bullet-row"><span class="bnum">01</span>
+        <p class="btext">Studied a production-grade microservice ecosystem firsthand, gaining practical understanding of
+          <strong>interservice REST API communication</strong> and API consumption patterns across distributed services.
+        </p>
+      </div>
+      <div class="bullet-row"><span class="bnum">02</span>
+        <p class="btext">Designed relational database schemas as part of structured training exercises, producing
+          <strong>5–10 tables</strong> with normalized relationships to model real-world business data.
+        </p>
+      </div>
+      <div class="bullet-row"><span class="bnum">03</span>
+        <p class="btext">Built <strong>10–20 practice CRUD endpoints</strong> using ASP.NET Core (C#), applying
+          interservice API consumption patterns to simulate real microservice communication flows.</p>
+      </div>
+      <div class="bullet-row last-bullet"><span class="bnum">04</span>
+        <p class="btext">Implemented <strong>Role-Based Access Control (RBAC)</strong> within a working codebase,
+          configuring role definitions, permission scopes, and route-level authorization middleware.</p>
+      </div>
+    </div>
+
+    <!-- LatinPay Project Card -->
+    <div class="proj-block">
+      <div class="proj-header">
+        <span class="proj-kicker">INTERNSHIP PROJECT</span>
+        <span class="proj-divider"></span>
+        <span class="proj-name">LATINPAY</span>
+        <a href="https://latinpay.com/" class="proj-link"><i class="fa-solid fa-globe"></i> latinpay.com</a>
+      </div>
+      <div class="proj-body">
+        <p class="proj-desc">Studied LatinPay — a U.S.-based fintech platform serving the Latin American community with
+          prepaid Visa cards, mobile top-up, and bill payments — as a live reference system during internship training.
+          Participated in daily standups, gaining firsthand exposure to how a professional development team operates and
+          manages sprint work.</p>
+        <div class="tags">
+          <span class="tag">ASP.NET Core (C#)</span>
+          <span class="tag">Microservices</span>
+          <span class="tag">REST API Consumption</span>
+          <span class="tag">MariaDB</span>
+          <span class="tag">Agile / Daily Standups</span>
+          <span class="tag">Fintech</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CEU Internship -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">INTERNSHIP — INSTITUTIONAL</span>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="exp-header">
+      <p class="exp-company">Centro Escolar University Malolos</p>
+      <div class="exp-right">
+        <p class="exp-role">DATA ENTRY INTERN</p>
+        <p class="exp-date">2025 · 50 Hours · Physical Plant & Facilities Department</p>
+      </div>
+    </div>
+
+    <div class="bullets">
+      <div class="bullet-row"><span class="bnum">01</span>
+        <p class="btext">Digitized manual pen-and-paper facility logs and records into structured <strong>Google
+            Sheets</strong> spreadsheets, improving data accessibility and reducing retrieval time for department staff.
+        </p>
+      </div>
+      <div class="bullet-row"><span class="bnum">02</span>
+        <p class="btext">Ensured accuracy and consistency of encoded data by cross-referencing physical records,
+          applying data validation practices throughout the digitization process.</p>
+      </div>
+      <div class="bullet-row last-bullet"><span class="bnum">03</span>
+        <p class="btext">Completed the required <strong>50-hour institutional internship</strong> as part of the BS
+          Information Technology curriculum, demonstrating reliability and attention to detail in a non-technical office
+          environment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">EDUCATION</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="edu-block">
+      <div class="edu-top-row">
+        <p class="edu-school">Centro Escolar University Malolos</p>
+        <p class="edu-year">2021 — 2025</p>
+      </div>
+      <div class="edu-mid-row">
+        <p class="edu-degree">Bachelor of Science in Information Technology</p>
+        <p class="edu-honors">Magna Cum Laude</p>
+      </div>
+      <p class="honor-detail">Graduated with high distinction · GWA 1.25 · Top 8 Overall, Highest-Ranking Male Graduate
+      </p>
+      <div class="edu-awards">
+        <span class="award-pill">Top 8 Overall Graduate</span>
+        <span class="award-pill">Highest-Ranking Male Graduate</span>
+        <span class="award-pill">Dean's List — 1st Year</span>
+        <span class="award-pill">Consistent President's List — 2nd to 4th Year</span>
+        <span class="award-pill">Research Forum: 1st in Oral Presentations</span>
+        <span class="award-pill">Research Forum: 3rd in Poster Presentations</span>
+        <span class="award-pill">Meritorious Award in Research</span>
+      </div>
+    </div>
+
+    <div class="shs-card" style="margin-top: 10px;">
+      <div class="shs-card-header">
+        <span class="shs-badge">Secondary Education</span>
+      </div>
+      <div class="shs-card-body">
+        <div>
+          <p class="shs-school">St. Mary's College of Meycauayan</p>
+          <p class="shs-strand">Senior High School · Accountancy, Business and Management (ABM) Strand</p>
+        </div>
+        <span class="shs-year">2019 — 2021</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- LICENSES & CERTIFICATIONS -->
+  <section class="section licenses-section">
+    <div class="section-header">
+      <span class="section-label">LICENSES & CERTIFICATIONS</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="certs-grid">
+      <div class="cert-row">
+        <span class="cert-num">01</span>
+        <div>
+          <p class="cert-name">Oracle Cloud 2025 Certified Developer Professional</p>
+          <div class="cert-issuer-row">
+            <span class="cert-issuer">Oracle University · Oct 2025 — Oct 2027</span>
+            <span class="cert-issuer-dot">·</span>
+            <a href="https://catalog-education.oracle.com/pls/certview/sharebadge?id=7C9D000F6E0EB1B436D1DBCB0F2232B182454039B3266E6A78DA85DCEF12CBB5"
+              class="cred-text-link"><i class="fa-solid fa-certificate"></i> Credential</a>
+          </div>
+        </div>
+      </div>
+      <div class="cert-row">
+        <span class="cert-num">02</span>
+        <div>
+          <p class="cert-name">Fortinet Certified Associate in Cybersecurity</p>
+          <div class="cert-issuer-row">
+            <span class="cert-issuer">Fortinet Training Institute · May 2025 — May 2027</span>
+            <span class="cert-issuer-dot">·</span>
+            <a href="https://training.fortinet.com/admin/tool/certificate/index.php?code=1301643014DA"
+              class="cred-text-link"><i class="fa-solid fa-certificate"></i> Credential</a>
+          </div>
+        </div>
+      </div>
+      <div class="cert-row">
+        <span class="cert-num">03</span>
+        <div>
+          <p class="cert-name">Fortinet Certified Fundamentals in Cybersecurity</p>
+          <div class="cert-issuer-row">
+            <span class="cert-issuer">Fortinet · May 2025 — May 2027</span>
+            <span class="cert-issuer-dot">·</span>
+            <a href="https://training.fortinet.com/admin/tool/certificate/index.php?code=3272474919DA"
+              class="cred-text-link"><i class="fa-solid fa-certificate"></i> Credential</a>
+          </div>
+        </div>
+      </div>
+      <div class="cert-row">
+        <span class="cert-num">04</span>
+        <div>
+          <p class="cert-name">Foundational C# with Microsoft</p>
+          <div class="cert-issuer-row">
+            <span class="cert-issuer">freeCodeCamp / Microsoft · Jun 2025</span>
+            <span class="cert-issuer-dot">·</span>
+            <a href="https://www.freecodecamp.org/certification/daniel_est_03/foundational-c-sharp-with-microsoft"
+              class="cred-text-link"><i class="fa-solid fa-certificate"></i> Credential</a>
+          </div>
+        </div>
+      </div>
+      <div class="cert-row">
+        <span class="cert-num">05</span>
+        <div>
+          <p class="cert-name">Oracle Cloud 2025 Certified AI Foundations Associate</p>
+          <div class="cert-issuer-row">
+            <span class="cert-issuer">Oracle University · Oct 2025 — Oct 2027</span>
+            <span class="cert-issuer-dot">·</span>
+            <a href="https://catalog-education.oracle.com/pls/certview/sharebadge?id=813EDF5358C156BEB66A7E82B9918C06E8BCC2D3A837D789ED28949EE929689D"
+              class="cred-text-link"><i class="fa-solid fa-certificate"></i> Credential</a>
+          </div>
+        </div>
+      </div>
+      <div class="cert-row">
+        <span class="cert-num">06</span>
+        <div>
+          <p class="cert-name">NC2: Computer Systems Servicing</p>
+          <p class="cert-issuer">TESDA · Jul 2022 — Jul 2027</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">PROJECTS</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="acad-grid">
+      <div class="acad-left">
+        <p class="acad-kicker">Full Stack Developer</p>
+        <p class="acad-name">CEU Vault</p>
+        <p class="acad-desc">Full-stack equipment reservation system digitizing a manual pen-and-paper lending facility.
+          Designed and implemented both client-side and server-side components using an Express backend, HTML5/Bootstrap
+          frontend, and a modular MVC-inspired architecture — integrating REST APIs, PostgreSQL, Redis, Nodemailer, and
+          PDF generation.</p>
+        <div class="tags">
+          <span class="tag">HTML/CSS</span>
+          <span class="tag">Bootstrap</span>
+          <span class="tag">Express.js</span>
+          <span class="tag">PostgreSQL</span>
+          <span class="tag">Redis Cloud</span>
+          <span class="tag">Neon DB</span>
+          <span class="tag">Vercel</span>
+        </div>
+      </div>
+      <div class="acad-right">
+        <p class="acad-date">Oct 2024 — Dec 2024</p>
+        <div class="acad-links">
+          <div class="acad-links-row">
+            <a href="https://ceu-vault.vercel.app" class="acad-link"><i class="fa-solid fa-globe"></i> Live site</a>
+            <a href="https://ceu-vault.vercel.app/admin" class="acad-link"><i class="fa-solid fa-lock"></i> /admin</a>
+          </div>
+          <a href="https://github.com/danielEst-dev/CEUVault-Redis" class="acad-link acad-link-center"><i
+              class="fa-brands fa-github"></i> CEUVault-Redis</a>
+        </div>
+        <div class="creds-table">
+          <div class="creds-table-header">Admin test credentials</div>
+          <div class="creds-table-row">
+            <span class="creds-table-key">User</span>
+            <span class="creds-table-val">admin@test.com</span>
+          </div>
+          <div class="creds-table-row">
+            <span class="creds-table-key">Pass</span>
+            <span class="creds-table-val">admin123</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hotel Booking System -->
+    <div class="acad-grid" style="margin-top: 10px;">
+      <div class="acad-left">
+        <p class="acad-kicker">Full Stack Developer</p>
+        <p class="acad-name">Hotel Booking System</p>
+        <p class="acad-desc">
+          Solo-built full-stack hotel management system comprising a 15-endpoint RESTful API and a Bootstrap front-end
+          dashboard, built on Node.js and Express with a modular MVC-inspired architecture. Covers room, guest, and
+          booking workflows with Yup request validation, a normalized 3-table PostgreSQL schema, and third-party weather
+          data fetched from Open-Meteo and stored as JSONB. Automates booking completion via a node-cron scheduled job
+          and includes Jest unit tests with mocked database calls.</p>
+        <div class="tags">
+          <span class="tag">Node.js</span>
+          <span class="tag">Express.js</span>
+          <span class="tag">PostgreSQL</span>
+          <span class="tag">REST APIs</span>
+          <span class="tag">Yup</span>
+          <span class="tag">Jest</span>
+          <span class="tag">node-cron</span>
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+
+
+        </div>
+      </div>
+      <div class="acad-right">
+        <div class="acad-stat-block">
+          <span class="acad-stat-label">Endpoints</span>
+          <span class="acad-stat-val">15 REST</span>
+        </div>
+        <div class="acad-stat-divider"></div>
+        <div class="acad-stat-block">
+          <span class="acad-stat-label">Tables</span>
+          <span class="acad-stat-val">3 schemas</span>
+        </div>
+        <div class="acad-stat-divider"></div>
+        <div class="acad-stat-block">
+          <span class="acad-stat-label">Year</span>
+          <span class="acad-stat-val">2026</span>
+        </div>
+        <div class="acad-stat-divider"></div>
+        <a href="https://github.com/danielEst-dev/hotel_booking" class="acad-link acad-link-center"
+          style="margin-top: auto;"><i class="fa-brands fa-github"></i> View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNICAL SKILLS -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">TECHNICAL SKILLS</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="skills-band">
+      <div class="skill-row">
+        <span class="skill-row-label">Languages</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">C#</span>
+          <span class="skill-pill">JavaScript</span>
+          <span class="skill-pill">TypeScript</span>
+          <span class="skill-pill">Python</span>
+          <span class="skill-pill">Java</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Backend</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">ASP.NET Core</span>
+          <span class="skill-pill">.NET Core</span>
+          <span class="skill-pill">.NET Framework</span>
+          <span class="skill-pill">Express.js</span>
+          <span class="skill-pill">NextJS</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Frontend</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">React</span>
+          <span class="skill-pill">NextJS</span>
+          <span class="skill-pill">Tailwind CSS</span>
+          <span class="skill-pill">Bootstrap</span>
+          <span class="skill-pill">HTML5</span>
+          <span class="skill-pill">CSS3</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Databases</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">PostgreSQL</span>
+          <span class="skill-pill">MySQL</span>
+          <span class="skill-pill">MariaDB</span>
+          <span class="skill-pill">MS SQL</span>
+          <span class="skill-pill">Neon DB</span>
+          <span class="skill-pill">Redis</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Protocols &amp; Patterns</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">RESTful APIs</span>
+          <span class="skill-pill">gRPC</span>
+          <span class="skill-pill">Microservices</span>
+          <span class="skill-pill">MVC</span>
+          <span class="skill-pill">Modular Monolith</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Tools &amp; Platforms</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Git</span>
+          <span class="skill-pill">GitHub</span>
+          <span class="skill-pill">JIRA</span>
+          <span class="skill-pill">Figma</span>
+          <span class="skill-pill">Visual Studio</span>
+          <span class="skill-pill">VS Code</span>
+          <span class="skill-pill">JetBrains</span>
+          <span class="skill-pill">Claude Code</span>
+          <span class="skill-pill">GitHub Copilot</span>
+          <span class="skill-pill">Vercel</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADDITIONAL SKILLS -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">ADDITIONAL SKILLS</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="skills-band">
+      <div class="skill-row">
+        <span class="skill-row-label">Soft Skills</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Problem Solving</span>
+          <span class="skill-pill">Analytical Thinking</span>
+          <span class="skill-pill">Communication</span>
+          <span class="skill-pill">Team Collaboration</span>
+          <span class="skill-pill">Time Management</span>
+          <span class="skill-pill">Adaptability</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Microsoft Office</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Word</span>
+          <span class="skill-pill">Excel</span>
+          <span class="skill-pill">PowerPoint</span>
+          <span class="skill-pill">Outlook</span>
+          <span class="skill-pill">Teams</span>
+          <span class="skill-pill">OneDrive</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">General &amp; Productivity</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Google Docs</span>
+          <span class="skill-pill">Google Sheets</span>
+          <span class="skill-pill">Google Slides</span>
+          <span class="skill-pill">Zoom</span>
+          <span class="skill-pill">Google Meet</span>
+          <span class="skill-pill">Typing (75+ WPM)</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Photo &amp; Video</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Adobe Photoshop</span>
+          <span class="skill-pill">Adobe Firefly</span>
+          <span class="skill-pill">Gemini Nano</span>
+          <span class="skill-pill">Adobe Premiere Pro</span>
+          <span class="skill-pill">CapCut</span>
+          <span class="skill-pill">iMovie</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Design &amp; Media</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Canva</span>
+          <span class="skill-pill">Social Media Management</span>
+          <span class="skill-pill">Photography (mobile)</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Data Entry &amp; Admin</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Log digitization</span>
+          <span class="skill-pill">Google Sheets encoding</span>
+          <span class="skill-pill">Filing &amp; records management</span>
+          <span class="skill-pill">Printing &amp; scanning</span>
+          <span class="skill-pill">Email correspondence</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">IT &amp; Technical Support</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">PC troubleshooting &amp; formatting</span>
+          <span class="skill-pill">Hardware setup &amp; maintenance</span>
+          <span class="skill-pill">NC2: Computer Systems Servicing</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Research &amp; Writing</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Academic research</span>
+          <span class="skill-pill">Report writing</span>
+          <span class="skill-pill">Technical documentation</span>
+          <span class="skill-pill">Data analysis &amp; summarization</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <span class="skill-row-label">Languages</span>
+        <div class="skill-row-items">
+          <span class="skill-pill">Filipino — Native</span>
+          <span class="skill-pill">English — Professional proficiency</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+     PRINT MODE TOGGLE (hidden when printing)
+════════════════════════════════════════════════════════ -->
+  <div class="print-controls">
+    <button class="print-toggle" id="printToggle" onclick="togglePrintPanel()">
+      <i class="fa-solid fa-print"></i>
+    </button>
+    <div class="print-panel" id="printPanel">
+      <div class="print-modes">
+        <button class="print-btn active" id="btnMultiPage" onclick="setPrintMode('multi')">
+          <i class="fa-solid fa-copy"></i> Multi-page
+        </button>
+        <button class="print-btn" id="btnSingleCanvas" onclick="setPrintMode('single')">
+          <i class="fa-solid fa-square"></i> Single Canvas
+        </button>
+      </div>
+      <button class="print-btn print-btn-action" id="btnPrint" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> Print
+      </button>
+    </div>
+  </div>
+
+  <script>
+    var currentMode = 'multi';
+    var dynStyle = document.getElementById('dynamic-page-size');
+    var panelOpen = false;
+
+    function togglePrintPanel() {
+      panelOpen = !panelOpen;
+      var panel = document.getElementById('printPanel');
+      var toggle = document.getElementById('printToggle');
+      if (panelOpen) {
+        panel.classList.add('open');
+        toggle.style.borderColor = 'var(--accent)';
+        toggle.style.color = 'var(--accent)';
+      } else {
+        panel.classList.remove('open');
+        toggle.style.borderColor = '';
+        toggle.style.color = '';
+      }
+    }
+
+    // Close panel when clicking outside
+    document.addEventListener('click', function (e) {
+      var controls = document.querySelector('.print-controls');
+      var panel = document.getElementById('printPanel');
+      var toggle = document.getElementById('printToggle');
+      if (panelOpen && !controls.contains(e.target)) {
+        panelOpen = false;
+        panel.classList.remove('open');
+        toggle.style.borderColor = '';
+        toggle.style.color = '';
+      }
+    });
+
+    function setPrintMode(mode) {
+      currentMode = mode;
+      var btnMulti = document.getElementById('btnMultiPage');
+      var btnSingle = document.getElementById('btnSingleCanvas');
+
+      if (mode === 'single') {
+        document.body.classList.add('single-canvas');
+        btnMulti.classList.remove('active');
+        btnSingle.classList.add('active');
+
+        /* Measure the full content height.
+           @page margin: 14mm top/bottom, 15mm left/right — matches screen body padding.
+           1 CSS px ≈ 0.26458 mm at standard 96 dpi.
+           We measure scrollHeight (content height without @page margins),
+           then add 28mm (top + bottom 14mm margins) to get the total page height. */
+        var heightPx = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        );
+        var contentMm = Math.ceil(heightPx * 0.26458);
+        var totalMm = contentMm + 28; /* +28mm for top + bottom 14mm @page margins */
+        dynStyle.textContent =
+          '@media print { @page { size: 210mm ' + totalMm + 'mm !important; margin: 14mm 15mm !important; } }';
+      } else {
+        document.body.classList.remove('single-canvas');
+        btnMulti.classList.add('active');
+        btnSingle.classList.remove('active');
+        dynStyle.textContent = ''; /* restore default A4 @page */
+      }
+    }
+  </script>
+
+</body>
+
+</html>
