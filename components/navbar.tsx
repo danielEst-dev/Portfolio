@@ -15,7 +15,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="font-serif text-lg tracking-tight text-foreground">
+          <Link href="/" className="text-lg font-medium tracking-tight text-foreground">
             {personalInfo.name}
           </Link>
 

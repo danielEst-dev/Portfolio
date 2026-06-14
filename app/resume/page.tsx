@@ -24,7 +24,8 @@ export default function ResumePage() {
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
                   Resume
                 </p>
-                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground">
+                <div className="accent-rule mb-5" />
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-foreground">
                   {personalInfo.name}
                 </h1>
               </div>
@@ -51,7 +52,7 @@ export default function ResumePage() {
                   <span className="absolute left-[-5px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent border-2 border-background" />
                   <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-3">
                     <div>
-                      <h3 className="font-serif text-xl md:text-2xl text-foreground">{exp.company}</h3>
+                      <h3 className="text-xl md:text-2xl font-medium text-foreground">{exp.company}</h3>
                       <p className="text-sm text-muted-foreground">{exp.role}</p>
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">{exp.date}</span>
@@ -76,7 +77,7 @@ export default function ResumePage() {
             <SectionLabel label="Education" />
             <div className="grid md:grid-cols-[1fr_280px] gap-8 items-start">
               <div>
-                <h3 className="font-serif text-xl md:text-2xl text-foreground mb-1">{education.school}</h3>
+                <h3 className="text-xl md:text-2xl font-medium text-foreground mb-1">{education.school}</h3>
                 <p className="text-sm text-muted-foreground mb-4">{education.degree}</p>
                 <p className="text-xs text-muted-foreground mb-4">{education.detail}</p>
                 <div className="flex flex-wrap gap-2">
@@ -94,7 +95,7 @@ export default function ResumePage() {
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-2">
                   Honors
                 </p>
-                <p className="font-serif text-3xl md:text-4xl text-accent mb-2">{education.honors}</p>
+                <p className="text-3xl md:text-4xl font-medium text-accent mb-2">{education.honors}</p>
                 <p className="text-sm text-muted-foreground">GWA 1.25</p>
               </div>
             </div>

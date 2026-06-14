@@ -24,7 +24,8 @@ export default function ProjectsPage() {
             </MotionWrapper>
 
             <MotionWrapper delay={0.1} className="mb-16">
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-4">
+              <div className="accent-rule mb-6" />
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-foreground mb-4">
                 Selected projects
               </h1>
               <p className="text-muted-foreground max-w-xl text-base">
@@ -41,7 +42,7 @@ export default function ProjectsPage() {
                   >
                     <div className="grid md:grid-cols-[1fr_220px_80px] gap-6 md:gap-8 items-start">
                       <div>
-                        <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-2 group-hover:text-accent transition-colors">
+                        <h2 className="text-2xl md:text-3xl font-medium text-foreground mb-2 group-hover:text-accent transition-colors">
                           {project.name}
                         </h2>
                         <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">

@@ -6,16 +6,17 @@ import { skills } from "@/lib/data";
 
 export function Skills() {
   return (
-    <section id="skills" className="py-20 md:py-28">
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+    <section id="skills" className="py-20 md:py-28 relative overflow-hidden">
+      <div className="section-number top-0 left-0 -translate-x-1/4 -translate-y-1/4">04</div>
+      <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
-          <SectionLabel label="Technical Skills" />
+          <SectionLabel label="Technical Skills" number="04" />
         </MotionWrapper>
 
         <div className="grid md:grid-cols-2 gap-x-16 gap-y-10">
           {Object.entries(skills).map(([category, items], index) => (
             <MotionWrapper key={category} delay={index * 0.05}>
-              <div>
+              <div className="corner-bracket p-5 border border-border/60 bg-transparent">
                 <h3 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
                   {category}
                 </h3>

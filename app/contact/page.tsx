@@ -21,7 +21,8 @@ export default function ContactPage() {
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
               Contact
             </p>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+            <div className="accent-rule mx-auto mb-6" />
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-foreground mb-6">
               Let&apos;s talk
             </h1>
             <p className="text-muted-foreground mb-12 max-w-lg mx-auto">

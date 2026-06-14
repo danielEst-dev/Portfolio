@@ -49,7 +49,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
                 {project.kicker}
               </p>
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-4">
+              <div className="accent-rule mb-5" />
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-foreground mb-4">
                 {project.name}
               </h1>
               <p className="text-sm text-muted-foreground">
