@@ -6,15 +6,14 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/60 bg-muted/30 mt-auto">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
+    <footer className="border-t border-border/40 mt-auto">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-center sm:text-left">
-            <p className="text-sm font-medium">{personalInfo.name}</p>
-            <p className="text-xs text-muted-foreground">{personalInfo.title}</p>
-          </div>
+          <p className="text-xs text-muted-foreground">
+            © {year} {personalInfo.name}
+          </p>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-5">
             <Link
               href={personalInfo.github}
               target="_blank"
@@ -22,7 +21,7 @@ export function Footer() {
               className="text-muted-foreground hover:text-foreground transition-colors"
               aria-label="GitHub"
             >
-              <Github className="h-5 w-5" />
+              <Github className="h-[18px] w-[18px]" />
             </Link>
             <Link
               href={personalInfo.linkedin}
@@ -31,22 +30,16 @@ export function Footer() {
               className="text-muted-foreground hover:text-foreground transition-colors"
               aria-label="LinkedIn"
             >
-              <Linkedin className="h-5 w-5" />
+              <Linkedin className="h-[18px] w-[18px]" />
             </Link>
             <Link
               href={`mailto:${personalInfo.email}`}
               className="text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Email"
             >
-              <Mail className="h-5 w-5" />
+              <Mail className="h-[18px] w-[18px]" />
             </Link>
           </div>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-border/60 text-center">
-          <p className="text-xs text-muted-foreground">
-            © {year} {personalInfo.name}. Built with Next.js, Tailwind CSS & shadcn/ui.
-          </p>
         </div>
       </div>
     </footer>

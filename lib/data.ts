@@ -1,13 +1,16 @@
 export const personalInfo = {
   name: "Daniel Anthony S. Estrella",
+  role: "Junior Backend Developer",
   title: "Software Development · Backend Engineer",
+  shortBio:
+    "Magna Cum Laude BS IT graduate. Built 130+ RESTful API endpoints across 7 microservices at Xentra Solutions, Inc. Core stack: ASP.NET Core (C#), Node.js, PostgreSQL, MariaDB, Redis.",
   summary:
     "Magna Cum Laude BS Information Technology graduate and backend developer with professional experience building production-grade microservice architectures using ASP.NET Core (C#). Independently developed 130+ RESTful API endpoints across 7 microservice repositories within a live commercial product. Proficient in .NET Core, Node.js, Express.js, PostgreSQL, MariaDB, and Redis, with working knowledge of React and Next.js. Experienced in Agile/Scrum workflows, Git, and relational database schema design. Oracle Cloud 2025 Certified Developer Professional.",
   phone: "+63 962 827 1366",
   email: "daniel.anth.est.03@gmail.com",
   location: "Meycauayan City, Bulacan",
   linkedin: "https://linkedin.com/in/daniel-est",
-  github: "https://github.com/danielEst-dev",
+  github: "https://github.com/daniel-est",
 };
 
 export const experiences = [
@@ -56,12 +59,12 @@ export const projects = [
     date: "2025 — Present",
     link: "https://brewbank.app",
     shortDescription:
-      "Contributed to the backend microservice architecture of BrewBank — a prepaid coffee loyalty platform for Australian cafés — focusing on core transaction and redemption API workflows using ASP.NET Core and MariaDB.",
+      "Microservices-based prepaid coffee loyalty platform for Australian cafés. Built RESTful transaction and redemption APIs across distributed services.",
     fullDescription: [
       "BrewBank is a prepaid coffee loyalty platform serving Australian cafés. As a junior backend developer at Xentra Solutions, I contribute to the backend microservice architecture that powers customer accounts, café transactions, and loyalty redemption workflows.",
       "My work focuses on building and maintaining RESTful API endpoints across multiple microservices, ensuring reliable interservice communication, and designing normalized MariaDB schemas that support high-volume transaction data.",
     ],
-    tags: ["ASP.NET Core (C#)", "REST APIs", "Microservices", "MariaDB", "JIRA / Agile"],
+    tags: ["ASP.NET Core", "MariaDB", "Microservices"],
     highlights: [
       "Built and maintained RESTful API endpoints for transaction and redemption workflows",
       "Collaborated with frontend and mobile teams to align API contracts",
@@ -77,14 +80,14 @@ export const projects = [
     date: "Oct 2024 — Dec 2024",
     link: "https://ceu-vault.vercel.app",
     adminLink: "https://ceu-vault.vercel.app/admin",
-    repo: "https://github.com/danielEst-dev/CEUVault-Redis",
+    repo: "https://github.com/daniel-est/CEUVault-Redis",
     shortDescription:
-      "Full-stack equipment reservation system digitizing a manual pen-and-paper lending facility. Designed and implemented both client-side and server-side components using an Express backend, HTML5/Bootstrap frontend, and a modular MVC-inspired architecture.",
+      "Full-stack equipment reservation system digitizing a manual pen-and-paper lending facility. Express backend, Bootstrap frontend, PostgreSQL and Redis.",
     fullDescription: [
       "CEU Vault is a full-stack equipment reservation system built to digitize a manual pen-and-paper lending facility at Centro Escolar University Malolos.",
       "The application features an Express.js backend, an HTML5/Bootstrap frontend, and a modular MVC-inspired architecture. It integrates REST APIs, PostgreSQL, Redis Cloud, Neon DB, Nodemailer, and PDF generation to handle reservations, approvals, notifications, and reporting.",
     ],
-    tags: ["HTML/CSS", "Bootstrap", "Express.js", "PostgreSQL", "Redis Cloud", "Neon DB", "Vercel"],
+    tags: ["Express.js", "PostgreSQL", "Bootstrap", "Redis"],
     highlights: [
       "Digitized manual lending workflows into a web-based reservation system",
       "Built RESTful APIs with Express.js and PostgreSQL",
@@ -103,14 +106,14 @@ export const projects = [
     name: "Hotel Booking System",
     role: "Full Stack Developer",
     date: "2026",
-    repo: "https://github.com/danielEst-dev/hotel_booking",
+    repo: "https://github.com/daniel-est/hotel_booking",
     shortDescription:
-      "Solo-built full-stack hotel management system comprising a 15-endpoint RESTful API and a Bootstrap front-end dashboard, built on Node.js and Express with a modular MVC-inspired architecture.",
+      "Solo-built full-stack hotel management system with a 15-endpoint REST API, Bootstrap dashboard, and automated cron jobs.",
     fullDescription: [
       "A solo-built full-stack hotel management system with a 15-endpoint RESTful API and a Bootstrap front-end dashboard.",
       "Built on Node.js and Express with a modular MVC-inspired architecture, the system covers room, guest, and booking workflows. It uses Yup for request validation, a normalized 3-table PostgreSQL schema, and stores third-party weather data from Open-Meteo as JSONB. A node-cron scheduled job automates booking completion, and Jest unit tests with mocked database calls ensure reliability.",
     ],
-    tags: ["Node.js", "Express.js", "PostgreSQL", "REST APIs", "Yup", "Jest", "node-cron", "HTML", "CSS"],
+    tags: ["Node.js", "Express.js", "PostgreSQL", "Jest"],
     highlights: [
       "Built 15 RESTful API endpoints for room, guest, and booking workflows",
       "Designed a normalized 3-table PostgreSQL schema",
@@ -133,12 +136,12 @@ export const projects = [
     date: "2025",
     link: "https://latinpay.com/",
     shortDescription:
-      "Studied LatinPay — a U.S.-based fintech platform serving the Latin American community with prepaid Visa cards, mobile top-up, and bill payments — as a live reference system during internship training.",
+      "Internship reference project: a U.S.-based fintech platform for prepaid cards, mobile top-up, and bill payments.",
     fullDescription: [
       "LatinPay is a U.S.-based fintech platform serving the Latin American community with prepaid Visa cards, mobile top-up, and bill payments.",
       "During my internship at Xentra Solutions, I studied LatinPay as a live reference system to understand production-grade microservice architecture, interservice REST API communication, and Agile team operations.",
     ],
-    tags: ["ASP.NET Core (C#)", "Microservices", "REST API Consumption", "MariaDB", "Agile / Daily Standups", "Fintech"],
+    tags: ["ASP.NET Core", "Microservices", "MariaDB"],
     highlights: [
       "Studied production microservice architecture and interservice communication",
       "Observed daily standups and sprint workflows in a professional team",
@@ -209,13 +212,21 @@ export const certifications = [
   },
 ];
 
+export const certificationNames = [
+  "Oracle Cloud 2025 Developer Professional",
+  "Fortinet Cybersecurity Associate",
+  "Fortinet Cybersecurity Fundamentals",
+  "Foundational C# with Microsoft",
+  "Oracle Cloud 2025 AI Foundations Associate",
+  "TESDA NC2: Computer Systems Servicing",
+];
+
 export const skills = {
+  Backend: ["ASP.NET Core (C#)", ".NET Core", "Node.js", "Express.js", "REST APIs", "Microservices", "gRPC", "MVC"],
+  Databases: ["PostgreSQL", "MariaDB", "MySQL", "MS SQL", "Redis"],
+  Frontend: ["React", "Next.js", "Tailwind CSS", "Bootstrap", "HTML5", "CSS3"],
+  "DevOps & Tools": ["Git", "GitHub", "JIRA", "Figma", "Visual Studio", "VS Code", "Vercel"],
   Languages: ["C#", "JavaScript", "TypeScript", "Python", "Java"],
-  Backend: ["ASP.NET Core", ".NET Core", ".NET Framework", "Express.js", "NextJS"],
-  Frontend: ["React", "NextJS", "Tailwind CSS", "Bootstrap", "HTML5", "CSS3"],
-  Databases: ["PostgreSQL", "MySQL", "MariaDB", "MS SQL", "Neon DB", "Redis"],
-  "Protocols & Patterns": ["RESTful APIs", "gRPC", "Microservices", "MVC", "Modular Monolith"],
-  "Tools & Platforms": ["Git", "GitHub", "JIRA", "Figma", "Visual Studio", "VS Code", "JetBrains", "Claude Code", "GitHub Copilot", "Vercel"],
 };
 
 export const additionalSkills = {
@@ -232,7 +243,7 @@ export const additionalSkills = {
 
 export const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/projects", label: "Projects" },
+  { href: "/projects", label: "Work" },
   { href: "/resume", label: "Resume" },
   { href: "/contact", label: "Contact" },
 ];

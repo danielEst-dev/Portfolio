@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://danielestrella.dev/sitemap.xml",
+    sitemap: "https://daniel-est.vercel.app/sitemap.xml",
   };
 }

@@ -56,45 +56,76 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="grid sm:grid-cols-2 gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 text-left">
+      <div className="grid sm:grid-cols-2 gap-8">
         <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" placeholder="Your name" {...register("name")} />
+          <Label htmlFor="name" className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            Name
+          </Label>
+          <Input
+            id="name"
+            placeholder="Your name"
+            className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent"
+            {...register("name")}
+          />
           {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="you@example.com" {...register("email")} />
+          <Label htmlFor="email" className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            Email
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent"
+            {...register("email")}
+          />
           {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="subject">Subject</Label>
-        <Input id="subject" placeholder="What's this about?" {...register("subject")} />
+        <Label htmlFor="subject" className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          Subject
+        </Label>
+        <Input
+          id="subject"
+          placeholder="What's this about?"
+          className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent"
+          {...register("subject")}
+        />
         {errors.subject && <p className="text-xs text-destructive">{errors.subject.message}</p>}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="message">Message</Label>
+        <Label htmlFor="message" className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          Message
+        </Label>
         <Textarea
           id="message"
           placeholder="Tell me about your project or opportunity..."
-          rows={6}
+          rows={5}
+          className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent resize-none"
           {...register("message")}
         />
         {errors.message && <p className="text-xs text-destructive">{errors.message.message}</p>}
       </div>
-      <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...
-          </>
-        ) : (
-          <>
-            <Send className="mr-2 h-4 w-4" /> Send Message
-          </>
-        )}
-      </Button>
+      <div className="text-center pt-2">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-8 py-3 h-auto border border-foreground bg-transparent text-foreground hover:bg-foreground hover:text-background transition-colors rounded-none"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...
+            </>
+          ) : (
+            <>
+              <Send className="mr-2 h-4 w-4" /> Send Message
+            </>
+          )}
+        </Button>
+      </div>
     </form>
   );
 }

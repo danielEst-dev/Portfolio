@@ -3,65 +3,72 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
 import { navLinks, personalInfo } from "@/lib/data";
 import { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-14 items-center justify-between">
-          <Link href="/" className="text-sm font-semibold tracking-wide uppercase">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-sm">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <Link href="/" className="font-serif text-lg tracking-tight text-foreground">
             {personalInfo.name}
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                <Button
-                  variant={pathname === link.href ? "secondary" : "ghost"}
-                  size="sm"
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors link-underline ${
+                    isActive ? "text-foreground link-underline-active" : ""
+                  }`}
                 >
                   {link.label}
-                </Button>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
             <ThemeToggle />
           </nav>
 
-          <div className="flex items-center gap-1 md:hidden">
+          <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle />
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger>
-                <Button variant="ghost" size="icon" aria-label="Open menu">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-64">
-                <SheetTitle className="sr-only">Navigation menu</SheetTitle>
-                <nav className="flex flex-col gap-2 mt-6">
-                  {navLinks.map((link) => (
-                    <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>
-                      <Button
-                        variant={pathname === link.href ? "secondary" : "ghost"}
-                        className="justify-start w-full"
-                      >
-                        {link.label}
-                      </Button>
-                    </Link>
-                  ))}
-                </nav>
-              </SheetContent>
-            </Sheet>
+            <button
+              onClick={() => setOpen(!open)}
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Toggle menu"
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
       </div>
+
+      {open && (
+        <div className="md:hidden border-t border-border/40 bg-background">
+          <nav className="mx-auto max-w-6xl px-6 py-4 flex flex-col gap-4">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={`text-sm font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

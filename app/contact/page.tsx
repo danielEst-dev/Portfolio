@@ -4,7 +4,6 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ContactForm } from "@/components/contact-form";
 import { personalInfo } from "@/lib/data";
-import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Linkedin, Github } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -17,74 +16,54 @@ export default function ContactPage() {
     <>
       <Navbar />
       <main className="flex-1">
-        <section className="py-16 md:py-20">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-[1fr_320px] gap-10">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent mb-3">
-                  Contact
-                </p>
-                <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-3">
-                  Let&apos;s work together
-                </h1>
-                <p className="text-muted-foreground mb-8 max-w-xl">
-                  Have a project, job opportunity, or just want to connect? Fill out the form and I&apos;ll get back to you as soon as possible.
-                </p>
-                <ContactForm />
+        <section className="py-16 md:py-24">
+          <div className="mx-auto max-w-2xl px-6 lg:px-8 text-center">
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+              Contact
+            </p>
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
+              Let&apos;s talk
+            </h1>
+            <p className="text-muted-foreground mb-12 max-w-lg mx-auto">
+              Have a project, job opportunity, or just want to connect? Send a message and I&apos;ll get back to you soon.
+            </p>
+
+            <ContactForm />
+
+            <div className="mt-16 pt-10 border-t border-border/60">
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+                <Link
+                  href={`mailto:${personalInfo.email}`}
+                  className="inline-flex items-center gap-2 hover:text-accent transition-colors"
+                >
+                  <Mail className="h-4 w-4" /> {personalInfo.email}
+                </Link>
+                <span className="inline-flex items-center gap-2">
+                  <Phone className="h-4 w-4" /> {personalInfo.phone}
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <MapPin className="h-4 w-4" /> {personalInfo.location}
+                </span>
               </div>
-
-              <div className="space-y-5">
-                <Card>
-                  <CardContent className="p-5 space-y-4">
-                    <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Direct Contact
-                    </h2>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-sm">
-                        <Mail className="h-4 w-4 text-accent" />
-                        <Link href={`mailto:${personalInfo.email}`} className="hover:text-accent transition-colors">
-                          {personalInfo.email}
-                        </Link>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <Phone className="h-4 w-4 text-accent" />
-                        <span>{personalInfo.phone}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <MapPin className="h-4 w-4 text-accent" />
-                        <span>{personalInfo.location}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-5 space-y-4">
-                    <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Online Profiles
-                    </h2>
-                    <div className="space-y-3">
-                      <Link
-                        href={personalInfo.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm hover:text-accent transition-colors"
-                      >
-                        <Linkedin className="h-4 w-4 text-accent" />
-                        LinkedIn
-                      </Link>
-                      <Link
-                        href={personalInfo.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-sm hover:text-accent transition-colors"
-                      >
-                        <Github className="h-4 w-4 text-accent" />
-                        GitHub
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="flex justify-center gap-6 mt-6">
+                <Link
+                  href={personalInfo.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-accent transition-colors"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="h-5 w-5" />
+                </Link>
+                <Link
+                  href={personalInfo.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-accent transition-colors"
+                  aria-label="GitHub"
+                >
+                  <Github className="h-5 w-5" />
+                </Link>
               </div>
             </div>
           </div>

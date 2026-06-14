@@ -3,20 +3,19 @@
 import { SectionLabel } from "@/components/section-label";
 import { MotionWrapper } from "@/components/motion-wrapper";
 import { personalInfo } from "@/lib/data";
-import { MapPin, Phone, Mail } from "lucide-react";
 
 export function About() {
   return (
-    <section id="about" className="py-16 md:py-20">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <section id="about" className="py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <MotionWrapper>
           <SectionLabel label="About" />
         </MotionWrapper>
 
-        <div className="grid md:grid-cols-[1fr_280px] gap-10 items-start">
+        <div className="grid lg:grid-cols-[1fr_360px] gap-12 lg:gap-20 items-start">
           <MotionWrapper delay={0.1}>
-            <div className="space-y-4">
-              <p className="text-lg md:text-xl font-medium leading-relaxed text-foreground">
+            <div className="border-l-2 border-accent pl-6 md:pl-8">
+              <p className="font-serif text-2xl md:text-3xl leading-snug text-foreground mb-6">
                 Backend engineer focused on building reliable, scalable systems.
               </p>
               <p className="text-muted-foreground leading-relaxed">
@@ -26,22 +25,26 @@ export function About() {
           </MotionWrapper>
 
           <MotionWrapper delay={0.2}>
-            <div className="rounded-lg border border-border bg-card p-5 space-y-4">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Contact
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Phone className="h-4 w-4 text-accent" />
-                  <span>{personalInfo.phone}</span>
+            <div className="bg-secondary/50 border border-border/60 p-6 md:p-8">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                At a glance
+              </p>
+              <div className="space-y-4">
+                <div className="flex justify-between items-baseline border-b border-border/60 pb-3">
+                  <span className="text-sm text-muted-foreground">Experience</span>
+                  <span className="text-sm font-medium text-foreground">Junior Backend Developer</span>
                 </div>
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Mail className="h-4 w-4 text-accent" />
-                  <span>{personalInfo.email}</span>
+                <div className="flex justify-between items-baseline border-b border-border/60 pb-3">
+                  <span className="text-sm text-muted-foreground">Education</span>
+                  <span className="text-sm font-medium text-foreground">BS IT, Magna Cum Laude</span>
                 </div>
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <MapPin className="h-4 w-4 text-accent" />
-                  <span>{personalInfo.location}</span>
+                <div className="flex justify-between items-baseline border-b border-border/60 pb-3">
+                  <span className="text-sm text-muted-foreground">APIs built</span>
+                  <span className="text-sm font-medium text-foreground">130+ endpoints</span>
+                </div>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm text-muted-foreground">Microservices</span>
+                  <span className="text-sm font-medium text-foreground">7 repositories</span>
                 </div>
               </div>
             </div>
