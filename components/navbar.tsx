@@ -15,8 +15,13 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="text-lg font-medium tracking-tight text-foreground">
-            {personalInfo.name}
+          <Link href="/" className="group flex items-center gap-3 text-foreground" aria-label={personalInfo.name}>
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-foreground/20 text-xs font-semibold tracking-tight transition-colors group-hover:border-foreground/50 group-hover:bg-foreground group-hover:text-background">
+              DE
+            </span>
+            <span className="hidden text-sm font-medium tracking-tight sm:inline">
+              {personalInfo.name}
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
