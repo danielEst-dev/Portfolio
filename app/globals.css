@@ -244,3 +244,23 @@ body::before {
   border-left: 1px solid var(--accent);
   padding-left: 1rem;
 }
+
+/* Skills conveyor belt */
+@keyframes conveyor {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-conveyor {
+  animation: conveyor 35s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-conveyor {
+    animation: none;
+  }
+}

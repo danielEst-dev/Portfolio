@@ -2,7 +2,7 @@
 
 import { SectionLabel } from "@/components/section-label";
 import { MotionWrapper } from "@/components/motion-wrapper";
-import { skills } from "@/lib/data";
+import { skills, skillBeltItems } from "@/lib/data";
 
 export function Skills() {
   return (
@@ -12,6 +12,29 @@ export function Skills() {
         <MotionWrapper>
           <SectionLabel label="Technical Skills" number="04" />
         </MotionWrapper>
+
+        <div
+          className="relative overflow-hidden py-4 mb-10 border-y border-border/40"
+          style={{
+            maskImage:
+              "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+          }}
+        >
+          <div className="flex w-max animate-conveyor hover:[animation-play-state:paused]">
+            {[...skillBeltItems, ...skillBeltItems].map((skill, index) => (
+              <div key={`${skill}-${index}`} className="flex items-center shrink-0">
+                <span className="px-6 md:px-8 text-sm md:text-base font-mono uppercase tracking-[0.12em] text-foreground whitespace-nowrap">
+                  {skill}
+                </span>
+                <span className="text-muted-foreground" aria-hidden="true">
+                  /
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-x-16 gap-y-10">
           {Object.entries(skills).map(([category, items], index) => (
