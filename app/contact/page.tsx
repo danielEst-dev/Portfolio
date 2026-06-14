@@ -6,9 +6,26 @@ import { ContactForm } from "@/components/contact-form";
 import { personalInfo } from "@/lib/data";
 import { Mail, Phone, MapPin, Linkedin, Github } from "lucide-react";
 
+const title = "Contact — Daniel Anthony S. Estrella";
+const description = "Get in touch with Daniel Anthony S. Estrella for backend engineering opportunities and collaborations.";
+const ogImage = `/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
+
 export const metadata: Metadata = {
-  title: "Contact — Daniel Anthony S. Estrella",
-  description: "Get in touch with Daniel Anthony S. Estrella for backend engineering opportunities and collaborations.",
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    type: "website",
+    url: "/contact",
+    images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [ogImage],
+  },
 };
 
 export default function ContactPage() {

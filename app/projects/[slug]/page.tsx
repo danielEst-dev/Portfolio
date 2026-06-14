@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { projects } from "@/lib/data";
-import { ArrowLeft, ArrowUpRight, Github, Lock, Globe } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ArrowRight, Github, Lock, Globe } from "lucide-react";
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -18,19 +18,40 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug);
   if (!project) return { title: "Project Not Found" };
+
+  const title = `${project.name} — Daniel Anthony S. Estrella`;
+  const ogImage = `/api/og?title=${encodeURIComponent(project.name)}&description=${encodeURIComponent(project.shortDescription)}`;
+
   return {
-    title: `${project.name} — Daniel Anthony S. Estrella`,
+    title,
     description: project.shortDescription,
+    openGraph: {
+      title,
+      description: project.shortDescription,
+      type: "article",
+      url: `/projects/${project.slug}`,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: project.shortDescription,
+      images: [ogImage],
+    },
   };
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
+  const projectIndex = projects.findIndex((p) => p.slug === slug);
+  const project = projects[projectIndex];
 
   if (!project) {
     notFound();
   }
+
+  const prevProject = projects[projectIndex - 1] || null;
+  const nextProject = projects[projectIndex + 1] || null;
 
   return (
     <>
@@ -45,7 +66,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <ArrowLeft className="h-4 w-4" /> Back to work
             </Link>
 
-            <header className="mb-12">
+            <header className="mb-12" style={{ viewTransitionName: `project-${project.slug}` }}>
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
                 {project.kicker}
               </p>
@@ -60,15 +81,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             <div className="grid lg:grid-cols-[1fr_260px] gap-12 lg:gap-16">
               <div>
-                <div className="space-y-5 text-muted-foreground leading-relaxed mb-10">
-                  {project.fullDescription.map((paragraph, i) => (
-                    <p key={i}>{paragraph}</p>
-                  ))}
-                </div>
-
-                <section className="mb-10">
+                <section className="mb-12">
                   <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
-                    Highlights
+                    Context
+                  </h2>
+                  <div className="space-y-5 text-muted-foreground leading-relaxed">
+                    {project.fullDescription.map((paragraph, i) => (
+                      <p key={i}>{paragraph}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mb-12">
+                  <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                    What I Built
                   </h2>
                   <ul className="space-y-3">
                     {project.highlights.map((highlight, i) => (
@@ -81,7 +107,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </section>
 
                 {project.credentials && (
-                  <section className="mb-10 p-5 border border-border bg-secondary/30">
+                  <section className="mb-12 p-5 border border-border bg-secondary/30">
                     <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
                       Admin Test Credentials
                     </h2>
@@ -171,6 +197,43 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </div>
               </aside>
             </div>
+
+            {(prevProject || nextProject) && (
+              <nav className="mt-20 pt-10 border-t border-border">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {prevProject ? (
+                    <Link
+                      href={`/projects/${prevProject.slug}`}
+                      className="group flex flex-col gap-2 p-5 border border-border/60 hover:border-accent transition-colors"
+                    >
+                      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                        Previous
+                      </span>
+                      <span className="text-lg font-medium text-foreground group-hover:text-accent transition-colors">
+                        {prevProject.name}
+                      </span>
+                    </Link>
+                  ) : (
+                    <div />
+                  )}
+                  {nextProject ? (
+                    <Link
+                      href={`/projects/${nextProject.slug}`}
+                      className="group flex flex-col gap-2 p-5 border border-border/60 hover:border-accent transition-colors md:items-end md:text-right"
+                    >
+                      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                        Next
+                      </span>
+                      <span className="text-lg font-medium text-foreground group-hover:text-accent transition-colors flex items-center gap-2 md:flex-row-reverse">
+                        {nextProject.name} <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </Link>
+                  ) : (
+                    <div />
+                  )}
+                </div>
+              </nav>
+            )}
           </div>
         </article>
       </main>

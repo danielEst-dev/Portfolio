@@ -7,9 +7,26 @@ import { MotionWrapper } from "@/components/motion-wrapper";
 import { projects } from "@/lib/data";
 import { ArrowRight } from "lucide-react";
 
+const title = "Work — Daniel Anthony S. Estrella";
+const description = "Explore backend and full-stack projects by Daniel Anthony S. Estrella.";
+const ogImage = `/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
+
 export const metadata: Metadata = {
-  title: "Work — Daniel Anthony S. Estrella",
-  description: "Explore backend and full-stack projects by Daniel Anthony S. Estrella.",
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    type: "website",
+    url: "/projects",
+    images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [ogImage],
+  },
 };
 
 export default function ProjectsPage() {
@@ -39,6 +56,7 @@ export default function ProjectsPage() {
                   <Link
                     href={`/projects/${project.slug}`}
                     className="group block py-8 md:py-10 border-b border-border transition-colors hover:bg-secondary/20"
+                    style={{ viewTransitionName: `project-${project.slug}` }}
                   >
                     <div className="grid md:grid-cols-[1fr_220px_80px] gap-6 md:gap-8 items-start">
                       <div>

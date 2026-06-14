@@ -6,9 +6,26 @@ import { SectionLabel } from "@/components/section-label";
 import { personalInfo, experiences, education, certifications, skills } from "@/lib/data";
 import { Download, ArrowUpRight } from "lucide-react";
 
+const title = "Resume — Daniel Anthony S. Estrella";
+const description = "View the resume of Daniel Anthony S. Estrella, backend engineer and Magna Cum Laude graduate.";
+const ogImage = `/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
+
 export const metadata: Metadata = {
-  title: "Resume — Daniel Anthony S. Estrella",
-  description: "View the resume of Daniel Anthony S. Estrella, backend engineer and Magna Cum Laude graduate.",
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    type: "profile",
+    url: "/resume",
+    images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [ogImage],
+  },
 };
 
 export default function ResumePage() {
