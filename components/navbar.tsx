@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { navLinks, personalInfo } from "@/lib/data";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -34,6 +34,16 @@ export function Navbar() {
                 </Link>
               );
             })}
+            <button
+              onClick={() => {
+                document.dispatchEvent(new CustomEvent("open-command-palette"));
+              }}
+              className="hidden lg:flex items-center gap-2 rounded border border-border/60 bg-secondary/50 px-2 py-1 text-[10px] font-mono text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+              aria-label="Open command palette"
+            >
+              <Search className="h-3 w-3" />
+              <span>⌘K</span>
+            </button>
             <ThemeToggle />
           </nav>
 

@@ -72,8 +72,13 @@ export function CommandPalette() {
       }
     };
 
+    const paletteEvent = () => setOpen(true);
     document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
+    document.addEventListener("open-command-palette", paletteEvent);
+    return () => {
+      document.removeEventListener("keydown", down);
+      document.removeEventListener("open-command-palette", paletteEvent);
+    };
   }, []);
 
   const items: CommandItem[] = useMemo(() => {

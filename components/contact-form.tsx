@@ -65,7 +65,7 @@ export function ContactForm() {
           <Input
             id="name"
             placeholder="Your name"
-            className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent"
+            className="border-0 border-b border-border rounded-none bg-transparent px-0 pt-4 pb-3 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:border-accent dark:bg-transparent"
             {...register("name")}
           />
           {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
@@ -78,7 +78,7 @@ export function ContactForm() {
             id="email"
             type="email"
             placeholder="you@example.com"
-            className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent"
+            className="border-0 border-b border-border rounded-none bg-transparent px-0 pt-4 pb-3 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:border-accent dark:bg-transparent"
             {...register("email")}
           />
           {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
@@ -91,7 +91,7 @@ export function ContactForm() {
         <Input
           id="subject"
           placeholder="What's this about?"
-          className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent"
+          className="border-0 border-b border-border rounded-none bg-transparent px-0 pt-4 pb-3 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:border-accent dark:bg-transparent"
           {...register("subject")}
         />
         {errors.subject && <p className="text-xs text-destructive">{errors.subject.message}</p>}
@@ -104,7 +104,7 @@ export function ContactForm() {
           id="message"
           placeholder="Tell me about your project or opportunity..."
           rows={5}
-          className="border-0 border-b border-border rounded-none bg-transparent px-0 py-3 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:border-accent resize-none"
+          className="border-0 border-b border-border rounded-none bg-transparent px-0 pt-4 pb-3 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:border-accent resize-none dark:bg-transparent"
           {...register("message")}
         />
         {errors.message && <p className="text-xs text-destructive">{errors.message.message}</p>}

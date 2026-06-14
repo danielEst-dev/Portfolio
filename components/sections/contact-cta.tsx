@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 export function ContactCta() {
   return (
     <section id="contact" className="py-20 md:py-28 relative overflow-hidden">
-      <div className="section-number top-0 right-0 translate-x-1/4 -translate-y-1/4">06</div>
+      <div className="section-number top-1/2 left-0 -translate-x-1/4 -translate-y-1/2">06</div>
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Get in Touch" number="06" />
