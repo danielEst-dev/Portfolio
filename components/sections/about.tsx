@@ -41,7 +41,7 @@ export function About() {
                 </div>
                 <div className="flex justify-between items-baseline border-b border-border/60 pb-3">
                   <span className="text-sm text-muted-foreground">APIs built</span>
-                  <span className="text-sm font-medium text-foreground">130+ endpoints</span>
+                  <span className="text-sm font-medium text-foreground">300+ endpoints</span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-sm text-muted-foreground">Microservices</span>
