@@ -5,7 +5,10 @@ export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get("title") || "Daniel Anthony S. Estrella";
+  const rawTitle = searchParams.get("title") || "Daniel Anthony S. Estrella";
+  const title = rawTitle.includes("Backend Engineer")
+    ? "Daniel Anthony S. Estrella"
+    : rawTitle;
   const description =
     searchParams.get("description") ||
     "Junior Backend Developer building scalable systems with ASP.NET Core, Node.js, and PostgreSQL.";
@@ -59,12 +62,12 @@ export async function GET(request: NextRequest) {
         </div>
         <h1
           style={{
-            fontSize: "72px",
+            fontSize: "64px",
             fontWeight: 500,
             color: "#1A1A1A",
-            lineHeight: 1.1,
+            lineHeight: 1.15,
             letterSpacing: "-0.02em",
-            marginBottom: "32px",
+            marginBottom: "40px",
             maxWidth: "900px",
           }}
         >
@@ -72,9 +75,9 @@ export async function GET(request: NextRequest) {
         </h1>
         <p
           style={{
-            fontSize: "32px",
+            fontSize: "28px",
             color: "#6B6B6B",
-            lineHeight: 1.4,
+            lineHeight: 1.5,
             maxWidth: "900px",
           }}
         >

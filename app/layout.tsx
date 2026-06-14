@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
   weight: ["400", "500"],
 });
 
-const defaultTitle = "Daniel Anthony S. Estrella — Backend Engineer";
+const defaultTitle = "Daniel Anthony S. Estrella";
 const defaultDescription =
   "Magna Cum Laude BS IT graduate and Junior Backend Developer building scalable systems with ASP.NET Core, Node.js, PostgreSQL, and microservices.";
 
