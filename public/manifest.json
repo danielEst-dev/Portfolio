@@ -4,8 +4,8 @@
   "description": "Portfolio of Daniel Anthony S. Estrella, backend engineer and Magna Cum Laude graduate.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fafaf8",
-  "theme_color": "#b08d5b",
+  "background_color": "#FAF9F6",
+  "theme_color": "#8B6F5C",
   "icons": [
     {
       "src": "/favicon.ico",

@@ -6,10 +6,12 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { navLinks, personalInfo } from "@/lib/data";
 import { useState } from "react";
 import { Menu, X, Search } from "lucide-react";
+import { useIsMac } from "@/lib/hooks";
 
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const isMac = useIsMac();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-sm">
@@ -47,7 +49,7 @@ export function Navbar() {
               aria-label="Open command palette"
             >
               <Search className="h-3 w-3" />
-              <span>⌘K</span>
+              <span>{isMac ? "⌘K" : "Ctrl+K"}</span>
             </button>
             <ThemeToggle />
           </nav>

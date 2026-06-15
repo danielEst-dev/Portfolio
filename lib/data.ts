@@ -212,14 +212,6 @@ export const certifications = [
   },
 ];
 
-export const certificationNames = [
-  "Oracle Cloud 2025 Developer Professional",
-  "Fortinet Cybersecurity Associate",
-  "Fortinet Cybersecurity Fundamentals",
-  "Foundational C# with Microsoft",
-  "Oracle Cloud 2025 AI Foundations Associate",
-  "TESDA NC2: Computer Systems Servicing",
-];
 
 export const skills = {
   Backend: ["ASP.NET Core (C#)", ".NET Core", "Node.js", "Express.js", "REST APIs", "Microservices", "gRPC", "MVC"],
@@ -263,17 +255,6 @@ export const skillBeltItems = [
   "Java",
 ];
 
-export const additionalSkills = {
-  "Soft Skills": ["Problem Solving", "Analytical Thinking", "Communication", "Team Collaboration", "Time Management", "Adaptability"],
-  "Microsoft Office": ["Word", "Excel", "PowerPoint", "Outlook", "Teams", "OneDrive"],
-  "General & Productivity": ["Google Docs", "Google Sheets", "Google Slides", "Zoom", "Google Meet", "Typing (75+ WPM)"],
-  "Photo & Video": ["Adobe Photoshop", "Adobe Firefly", "Gemini Nano", "Adobe Premiere Pro", "CapCut", "iMovie"],
-  "Design & Media": ["Canva", "Social Media Management", "Photography (mobile)"],
-  "Data Entry & Admin": ["Log digitization", "Google Sheets encoding", "Filing & records management", "Printing & scanning", "Email correspondence"],
-  "IT & Technical Support": ["PC troubleshooting & formatting", "Hardware setup & maintenance", "NC2: Computer Systems Servicing"],
-  "Research & Writing": ["Academic research", "Report writing", "Technical documentation", "Data analysis & summarization"],
-  Languages: ["Filipino — Native", "English — Professional proficiency"],
-};
 
 export const navLinks = [
   { href: "/", label: "Home" },

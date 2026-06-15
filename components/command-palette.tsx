@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { navLinks, projects, personalInfo } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { useIsMac } from "@/lib/hooks";
 import {
   Home,
   Briefcase,
@@ -54,6 +55,7 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndexState] = useState(0);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const isMac = useIsMac();
 
   const setQuery = (value: string) => {
     setQueryState(value);
@@ -152,6 +154,18 @@ export function CommandPalette() {
     return map;
   }, [filtered]);
 
+  // Precompute a flat index for each item id, avoiding mutable variables during render
+  const flatIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    let idx = 0;
+    for (const [, groupItems] of grouped) {
+      for (const item of groupItems) {
+        map.set(item.id, idx++);
+      }
+    }
+    return map;
+  }, [grouped]);
+
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
     if (!nextOpen) {
@@ -177,7 +191,7 @@ export function CommandPalette() {
     }
   };
 
-  let flatIndex = 0;
+
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -213,8 +227,8 @@ export function CommandPalette() {
                   {group}
                 </p>
                 {groupItems.map((item) => {
-                  const isSelected = flatIndex === selectedIndex;
-                  const index = flatIndex++;
+                  const index = flatIndexMap.get(item.id) ?? 0;
+                  const isSelected = index === selectedIndex;
                   const Icon = item.icon;
 
                   return (
@@ -255,7 +269,7 @@ export function CommandPalette() {
             </span>
           </div>
           <span>
-            <kbd className="rounded border border-border px-1 font-mono">⌘</kbd>
+            <kbd className="rounded border border-border px-1 font-mono">{isMac ? "⌘" : "Ctrl"}</kbd>
             <kbd className="rounded border border-border px-1 font-mono">K</kbd>
           </span>
         </div>

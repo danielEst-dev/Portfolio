@@ -1,5 +1,7 @@
 "use client";
 
+import { useIsMac } from "@/lib/hooks";
+
 export function OpenCommandPaletteButton({
   children,
 }: {
@@ -14,5 +16,14 @@ export function OpenCommandPaletteButton({
     >
       {children}
     </button>
+  );
+}
+
+export function ShortcutKbd() {
+  const isMac = useIsMac();
+  return (
+    <kbd className="rounded border border-border px-1.5 py-0.5 text-[10px] font-mono">
+      {isMac ? "⌘K" : "Ctrl+K"}
+    </kbd>
   );
 }

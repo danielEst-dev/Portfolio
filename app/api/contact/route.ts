@@ -22,6 +22,11 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   }
 }
 
+const ALLOWED_ORIGINS = [
+  "https://daniel-est.vercel.app",
+  ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
+];
+
 function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get("x-forwarded-for");
   return forwarded?.split(",")[0]?.trim() || "unknown";
@@ -29,6 +34,15 @@ function getClientIp(req: NextRequest): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // CSRF origin check
+    const origin = req.headers.get("origin");
+    if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
+      return NextResponse.json(
+        { success: false, error: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const parsed = contactSchema.safeParse(body);
 
@@ -51,21 +65,30 @@ export async function POST(req: NextRequest) {
           { status: 429 }
         );
       }
-      await redis.incr(rateKey);
-      await redis.expire(rateKey, 900);
+      // Use pipeline for atomic incr + expire to prevent TTL-less keys on crash
+      const pipeline = redis.pipeline();
+      pipeline.incr(rateKey);
+      pipeline.expire(rateKey, 900);
+      await pipeline.exec();
+    }
+
+    if (!resend) {
+      console.warn("Contact form: RESEND_API_KEY not configured, email not sent.");
+      return NextResponse.json(
+        { success: false, error: "Email service is not configured. Please try again later." },
+        { status: 503 }
+      );
     }
 
     const toEmail = process.env.TO_EMAIL || personalInfo.email;
 
-    if (resend) {
-      await resend.emails.send({
-        from: "Portfolio Contact <onboarding@resend.dev>",
-        to: [toEmail],
-        subject: `[Portfolio] ${subject}`,
-        text: `From: ${name} <${email}>\n\n${message}`,
-        replyTo: email,
-      });
-    }
+    await resend.emails.send({
+      from: "Portfolio Contact <onboarding@resend.dev>",
+      to: [toEmail],
+      subject: `[Portfolio] ${subject}`,
+      text: `From: ${name} <${email}>\n\n${message}`,
+      replyTo: email,
+    });
 
     return NextResponse.json({ success: true, message: "Message sent successfully." });
   } catch (error) {

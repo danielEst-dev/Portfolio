@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { OpenCommandPaletteButton } from "@/components/open-command-palette-button";
+import { OpenCommandPaletteButton, ShortcutKbd } from "@/components/open-command-palette-button";
 
 export const metadata = {
   title: "404 — Page Not Found",
@@ -32,7 +32,7 @@ export default function NotFound() {
               Go back home
             </Link>
             <OpenCommandPaletteButton>
-              Open command palette <kbd className="rounded border border-border px-1.5 py-0.5 text-[10px] font-mono">⌘K</kbd>
+              Open command palette <ShortcutKbd />
             </OpenCommandPaletteButton>
           </div>
         </div>

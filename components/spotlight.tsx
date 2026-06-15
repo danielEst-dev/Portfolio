@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 
 export function Spotlight() {
   const { theme } = useTheme();
   const [position, setPosition] = useState({ x: -1000, y: -1000 });
   const [enabled, setEnabled] = useState(false);
+  const rafId = useRef<number>(0);
+  const latestPos = useRef({ x: -1000, y: -1000 });
 
   useEffect(() => {
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
@@ -17,13 +19,22 @@ export function Spotlight() {
     }, 0);
 
     const handleMouseMove = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
+      latestPos.current = { x: e.clientX, y: e.clientY };
+      if (!rafId.current) {
+        rafId.current = requestAnimationFrame(() => {
+          setPosition(latestPos.current);
+          rafId.current = 0;
+        });
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => {
       window.clearTimeout(timeoutId);
       window.removeEventListener("mousemove", handleMouseMove);
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
     };
   }, []);
 
