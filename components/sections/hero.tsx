@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { SectionNumber } from "@/components/section-number";
 import { MagneticLink } from "@/components/magnetic-link";
+import { CodeParticles } from "@/components/code-particles";
 
 // Variants for the headline container — staggers children
 const headlineContainer = {
@@ -49,6 +50,7 @@ function AnimatedWords({ text, className }: { text: string; className?: string }
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
+      <CodeParticles />
       <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">01</SectionNumber>
       <div className="mx-auto max-w-6xl px-6 lg:px-8 py-24 md:py-32 lg:py-40 relative z-10">
         <div className="grid lg:grid-cols-[1fr_220px] gap-12 lg:gap-16 items-start">

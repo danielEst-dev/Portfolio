@@ -5,6 +5,7 @@ import { MotionWrapper } from "@/components/motion-wrapper";
 import { personalInfo } from "@/lib/data";
 import { motion } from "framer-motion";
 import { SectionNumber } from "@/components/section-number";
+import { CountUp } from "@/components/count-up";
 
 const statContainer = {
   hidden: {},
@@ -63,11 +64,15 @@ export function About() {
                 </motion.div>
                 <motion.div variants={statItem} className="flex justify-between items-baseline border-b border-border/60 pb-3">
                   <span className="text-sm text-muted-foreground">APIs built</span>
-                  <span className="text-sm font-medium text-foreground">300+ endpoints</span>
+                  <span className="text-sm font-medium text-foreground">
+                    <CountUp to={300} suffix="+ endpoints" duration={1600} />
+                  </span>
                 </motion.div>
                 <motion.div variants={statItem} className="flex justify-between items-baseline">
                   <span className="text-sm text-muted-foreground">Microservices</span>
-                  <span className="text-sm font-medium text-foreground">7 repositories</span>
+                  <span className="text-sm font-medium text-foreground">
+                    <CountUp to={7} suffix=" repositories" duration={900} />
+                  </span>
                 </motion.div>
               </motion.div>
             </div>
