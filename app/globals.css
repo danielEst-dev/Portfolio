@@ -264,6 +264,98 @@ body::before {
   }
 }
 
+/* ─── Project card hover: travelling border glow ─────────────────────────── */
+
+/* Register --border-angle so CSS can smoothly animate it */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+
+@keyframes border-travel {
+  to { --border-angle: 1turn; }
+}
+
+/*
+ * padding: 1px creates a stable 1px channel around card-inner (always present,
+ * so the box model never changes on hover — zero text reflow).
+ * overflow: hidden strictly bounds the conic gradient — nothing leaks outside.
+ */
+.project-card-wrapper {
+  position: relative;
+  isolation: isolate;
+  padding: 1px;
+  overflow: hidden;
+}
+
+/* Conic gradient fills the wrapper exactly; visible in the 1px padding channel */
+.project-card-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 10%,
+    #8B6F5C 30%,
+    #C4956A 40%,
+    #D4AF7A 45%,
+    #C4956A 52%,
+    #8B6F5C 62%,
+    transparent 78%
+  );
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: border-travel 4s linear infinite paused;
+  z-index: 0;
+}
+
+/* On hover: fade in and start spinning */
+.project-card-wrapper:hover::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+/*
+ * Card inner — sits at z-index 1 above the ::before gradient.
+ * The gradient only shows in the 1px wrapper padding gap around this element.
+ * Inner glow via inset box-shadow: no pseudo-element needed, zero layout impact.
+ */
+.project-card-inner {
+  padding: 2rem;
+  transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--background);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .project-card-inner {
+    padding: 2.5rem;
+  }
+}
+
+.project-card-wrapper:hover .project-card-inner {
+  box-shadow: inset 0 0 70px rgba(196, 149, 106, 0.08);
+}
+
+/* Respect reduced-motion: keep static glow but stop spinning */
+@media (prefers-reduced-motion: reduce) {
+  .project-card-wrapper::before {
+    animation: none;
+    background: conic-gradient(
+      from 45deg,
+      transparent 20%,
+      #8B6F5C 40%,
+      #C4956A 50%,
+      #8B6F5C 60%,
+      transparent 80%
+    );
+  }
+}
+
 /* Smooth theme transitions */
 html,
 body,
