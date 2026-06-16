@@ -5,7 +5,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { CommandPalette } from "@/components/command-palette";
 import { Spotlight } from "@/components/spotlight";
-import { Cursor } from "@/components/cursor";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -73,7 +72,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
           <Spotlight />
-          <Cursor />
           {children}
           <Toaster position="bottom-right" richColors />
           <CommandPalette />
