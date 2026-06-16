@@ -232,6 +232,22 @@ body::before {
   width: 40px;
   height: 2px;
   background-color: var(--accent);
+  animation: accent-grow 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+
+@keyframes accent-grow {
+  from { width: 0; }
+  to   { width: 40px; }
+}
+
+/* Arrow nudge — subtle infinite right-push for CTA arrows */
+.arrow-nudge {
+  animation: arrow-nudge 2s ease-in-out infinite;
+}
+
+@keyframes arrow-nudge {
+  0%,  100% { transform: translateX(0); }
+  50%       { transform: translateX(3px); }
 }
 
 /* Pull quote / side note */
@@ -262,97 +278,69 @@ body::before {
   .animate-conveyor {
     animation: none;
   }
-}
-
-/* ─── Project card hover: travelling border glow ─────────────────────────── */
-
-/* Register --border-angle so CSS can smoothly animate it */
-@property --border-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0turn;
-}
-
-@keyframes border-travel {
-  to { --border-angle: 1turn; }
-}
-
-/*
- * padding: 1px creates a stable 1px channel around card-inner (always present,
- * so the box model never changes on hover — zero text reflow).
- * overflow: hidden strictly bounds the conic gradient — nothing leaks outside.
- */
-.project-card-wrapper {
-  position: relative;
-  isolation: isolate;
-  padding: 1px;
-  overflow: hidden;
-}
-
-/* Conic gradient fills the wrapper exactly; visible in the 1px padding channel */
-.project-card-wrapper::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: conic-gradient(
-    from var(--border-angle),
-    transparent 10%,
-    #8B6F5C 30%,
-    #C4956A 40%,
-    #D4AF7A 45%,
-    #C4956A 52%,
-    #8B6F5C 62%,
-    transparent 78%
-  );
-  opacity: 0;
-  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: border-travel 4s linear infinite paused;
-  z-index: 0;
-}
-
-/* On hover: fade in and start spinning */
-.project-card-wrapper:hover::before {
-  opacity: 1;
-  animation-play-state: running;
-}
-
-/*
- * Card inner — sits at z-index 1 above the ::before gradient.
- * The gradient only shows in the 1px wrapper padding gap around this element.
- * Inner glow via inset box-shadow: no pseudo-element needed, zero layout impact.
- */
-.project-card-inner {
-  padding: 2rem;
-  transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: var(--background);
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  .project-card-inner {
-    padding: 2.5rem;
+  .accent-rule {
+    animation: none;
+  }
+  .arrow-nudge {
+    animation: none;
   }
 }
 
-.project-card-wrapper:hover .project-card-inner {
-  box-shadow: inset 0 0 70px rgba(196, 149, 106, 0.08);
+/* ─── Custom cursor ─────────────────────────────────────────────────────────── */
+
+/* Hide the default cursor globally on non-touch devices */
+@media (pointer: fine) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
 }
 
-/* Respect reduced-motion: keep static glow but stop spinning */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 50%;
+  /* translate(-50%,-50%) centres on the cursor position */
+  translate: -50% -50%;
+  transition: opacity 0.25s ease;
+  will-change: transform;
+}
+
+/* The small precise dot */
+.cursor-dot {
+  width: 5px;
+  height: 5px;
+  background-color: var(--accent);
+}
+
+/* The lagging ring */
+.cursor-ring {
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid rgba(var(--accent-rgb), 0.55);
+  background: transparent;
+  transition: opacity 0.25s ease, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+}
+
+/* Scale ring up slightly over clickable elements */
+.cursor-ring--active {
+  width: 36px;
+  height: 36px;
+  border-color: rgba(var(--accent-rgb), 0.85);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .project-card-wrapper::before {
-    animation: none;
-    background: conic-gradient(
-      from 45deg,
-      transparent 20%,
-      #8B6F5C 40%,
-      #C4956A 50%,
-      #8B6F5C 60%,
-      transparent 80%
-    );
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+  @media (pointer: fine) {
+    *, *::before, *::after {
+      cursor: auto !important;
+    }
   }
 }
 
