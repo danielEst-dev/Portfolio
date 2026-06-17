@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 interface CountUpProps {
   /** The final numeric value to count up to */
@@ -17,23 +17,44 @@ function easeOutQuart(t: number): number {
   return 1 - Math.pow(1 - t, 4);
 }
 
+// Subscribe to (prefers-reduced-motion: reduce). Returns false on the server
+// and on the first client render (no hydration mismatch), then updates.
+function subscribeReducedMotion(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getReducedMotionSnapshot() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getServerReducedMotionSnapshot() {
+  return false;
+}
+
 export function CountUp({
   to,
   suffix = "",
   duration = 1400,
   className,
 }: CountUpProps) {
-  const [value, setValue] = useState(0);
-  const [started, setStarted] = useState(false);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getServerReducedMotionSnapshot
+  );
+
+  const [value, setValue] = useState(prefersReducedMotion ? to : 0);
+  const [started, setStarted] = useState(prefersReducedMotion);
   const ref = useRef<HTMLSpanElement>(null);
   const rafRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setValue(to);
-      return;
-    }
+    if (prefersReducedMotion) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -48,7 +69,7 @@ export function CountUp({
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (!started) return;

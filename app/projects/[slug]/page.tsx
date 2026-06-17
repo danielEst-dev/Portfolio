@@ -106,21 +106,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </ul>
                 </section>
 
-                {project.credentials && (
+                {project.demoNote && (
                   <section className="mb-12 p-5 border border-border bg-secondary/30">
                     <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
-                      Admin Test Credentials
+                      Demo
                     </h2>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">User</span>
-                        <span className="font-mono">{project.credentials.user}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Pass</span>
-                        <span className="font-mono">{project.credentials.pass}</span>
-                      </div>
-                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {project.demoNote}{" "}
+                      <Link
+                        href="/contact"
+                        transitionTypes={["nav-forward"]}
+                        className="text-foreground underline underline-offset-4 hover:text-accent transition-colors"
+                      >
+                        Request access
+                      </Link>
+                    </p>
                   </section>
                 )}
               </div>
@@ -199,7 +199,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
 
             {(prevProject || nextProject) && (
-              <nav className="mt-20 pt-10 border-t border-border">
+              <nav className="mt-20 pt-10 border-t border-border" aria-label="Project navigation">
                 <div className="grid md:grid-cols-2 gap-6">
                   {prevProject ? (
                     <Link

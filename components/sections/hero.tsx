@@ -62,20 +62,22 @@ export function Hero() {
             {/* Accent rule animates its width via CSS on mount */}
             <div className="accent-rule mb-8" />
 
-            {/* Word-by-word headline reveal */}
+            {/* Word-by-word headline reveal. The visible text is the
+                accessible name; the per-word motion spans are marked
+                aria-hidden so AT reads the headline as a single phrase. */}
             <motion.h1
               className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-foreground mb-8"
               variants={headlineContainer}
               initial="hidden"
               animate="show"
-              aria-label="Building systems that scale."
             >
-              <span className="block overflow-hidden pb-1">
+              <span className="block overflow-hidden pb-1" aria-hidden="true">
                 <AnimatedWords text="Building systems" />
               </span>
-              <span className="block overflow-hidden pb-1">
+              <span className="block overflow-hidden pb-1" aria-hidden="true">
                 <AnimatedWords text="that scale." />
               </span>
+              <span className="sr-only">Building systems that scale.</span>
             </motion.h1>
 
             <div className="max-w-xl">

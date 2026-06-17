@@ -9,13 +9,11 @@ import { Spotlight } from "@/components/spotlight";
 const geistSans = Geist({
   variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["400", "500"],
 });
 
 const defaultTitle = "Daniel Anthony S. Estrella";
@@ -60,6 +58,7 @@ export const metadata: Metadata = {
     ],
   },
   metadataBase: new URL("https://daniel-est.vercel.app"),
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({

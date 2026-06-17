@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
@@ -49,6 +49,9 @@ type CommandItem = {
   action: () => void;
 };
 
+// Stable id for the listbox + its options so aria-activedescendant can reference them.
+const LISTBOX_ID = "command-palette-listbox";
+
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQueryState] = useState("");
@@ -56,6 +59,7 @@ export function CommandPalette() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const isMac = useIsMac();
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   const setQuery = (value: string) => {
     setQueryState(value);
@@ -68,6 +72,8 @@ export function CommandPalette() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      // Ignore key-repeat: holding Cmd/Ctrl+K would otherwise toggle repeatedly.
+      if (e.repeat) return;
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setOpen((prev) => !prev);
@@ -166,6 +172,17 @@ export function CommandPalette() {
     return map;
   }, [grouped]);
 
+  // Track the invoker so we can restore focus on close. The Dialog's
+  // mount lifecycle is the simplest place to capture document.activeElement.
+  useEffect(() => {
+    if (open) {
+      previouslyFocusedRef.current = (document.activeElement as HTMLElement) ?? null;
+    } else if (previouslyFocusedRef.current && document.body.contains(previouslyFocusedRef.current)) {
+      previouslyFocusedRef.current.focus();
+      previouslyFocusedRef.current = null;
+    }
+  }, [open]);
+
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
     if (!nextOpen) {
@@ -181,6 +198,12 @@ export function CommandPalette() {
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedIndex((prev) => (prev - 1 + filtered.length) % filtered.length);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setSelectedIndex(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setSelectedIndex(filtered.length - 1);
     } else if (e.key === "Enter") {
       e.preventDefault();
       const item = filtered[selectedIndex];
@@ -191,7 +214,8 @@ export function CommandPalette() {
     }
   };
 
-
+  const selectedItem = filtered[selectedIndex];
+  const activeDescendantId = selectedItem ? `${LISTBOX_ID}-option-${selectedItem.id}` : undefined;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -201,12 +225,17 @@ export function CommandPalette() {
       >
         <DialogTitle className="sr-only">Command palette</DialogTitle>
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <Command className="h-4 w-4 text-muted-foreground" />
+          <Command className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a command or search..."
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={LISTBOX_ID}
+            aria-autocomplete="list"
+            aria-activedescendant={activeDescendantId}
             className="h-auto flex-1 border-0 bg-transparent p-0 text-sm text-foreground placeholder:text-muted-foreground outline-none"
             autoFocus
           />
@@ -215,15 +244,23 @@ export function CommandPalette() {
           </kbd>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto py-2">
+        <div
+          id={LISTBOX_ID}
+          role="listbox"
+          aria-label="Commands"
+          className="max-h-[60vh] overflow-y-auto py-2"
+        >
           {filtered.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-muted-foreground">
               No results found.
             </p>
           ) : (
             Array.from(grouped.entries()).map(([group, groupItems]) => (
-              <div key={group} className="px-2 py-1">
-                <p className="px-2 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              <div key={group} role="presentation" className="px-2 py-1">
+                <p
+                  className="px-2 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
+                  role="presentation"
+                >
                   {group}
                 </p>
                 {groupItems.map((item) => {
@@ -234,6 +271,9 @@ export function CommandPalette() {
                   return (
                     <button
                       key={item.id}
+                      id={`${LISTBOX_ID}-option-${item.id}`}
+                      role="option"
+                      aria-selected={isSelected}
                       onMouseEnter={() => setSelectedIndex(index)}
                       onClick={() => {
                         setOpen(false);
@@ -246,7 +286,7 @@ export function CommandPalette() {
                           : "text-muted-foreground hover:bg-secondary/50"
                       )}
                     >
-                      <Icon className="h-4 w-4 shrink-0" />
+                      <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                       <span className="flex-1 truncate">{item.label}</span>
                     </button>
                   );

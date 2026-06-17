@@ -7,9 +7,11 @@ import { projects } from "@/lib/data";
 import { ArrowRight } from "lucide-react";
 import { SectionNumber } from "@/components/section-number";
 
-export function FeaturedProjects() {
-  const featured = projects.slice(0, 2);
+// Module-scope: `projects` is a stable static import, so the slice can be
+// computed once instead of on every render.
+const featured = projects.slice(0, 2);
 
+export function FeaturedProjects() {
   return (
     <section id="projects" className="py-20 md:py-28 bg-secondary/30 relative overflow-hidden">
       <SectionNumber className="top-1/2 right-0 translate-x-1/3 -translate-y-1/2">03</SectionNumber>

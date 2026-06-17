@@ -29,6 +29,9 @@ export function Skills() {
           <SectionLabel label="Technical Skills" number="04" />
         </MotionWrapper>
 
+        {/* Conveyor belt is purely visual — the duplicated list and
+            continuous marquee would be announced twice to AT users. The
+            list below is the accessible equivalent. */}
         <div
           className="relative overflow-hidden py-4 mb-10 border-y border-border/40"
           style={{
@@ -37,6 +40,7 @@ export function Skills() {
             WebkitMaskImage:
               "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
           }}
+          aria-hidden="true"
         >
           <div className="flex w-max animate-conveyor hover:[animation-play-state:paused]">
             {[...skillBeltItems, ...skillBeltItems].map((skill, index) => (
@@ -44,13 +48,17 @@ export function Skills() {
                 <span className="px-6 md:px-8 text-sm md:text-base font-mono uppercase tracking-[0.12em] text-foreground whitespace-nowrap">
                   {skill}
                 </span>
-                <span className="text-muted-foreground" aria-hidden="true">
-                  /
-                </span>
+                <span className="text-muted-foreground">/</span>
               </div>
             ))}
           </div>
         </div>
+
+        <ul className="sr-only" aria-label="Technical skills">
+          {skillBeltItems.map((skill) => (
+            <li key={skill}>{skill}</li>
+          ))}
+        </ul>
 
         <div className="grid md:grid-cols-2 gap-x-16 gap-y-10">
           {Object.entries(skills).map(([category, items], index) => (
@@ -70,7 +78,7 @@ export function Skills() {
                     <motion.span
                       key={item}
                       variants={tagItem}
-                      className="inline-flex items-center px-3 py-1.5 border border-border/80 text-sm text-foreground hover:border-accent hover:text-accent transition-colors cursor-default"
+                      className="inline-flex items-center px-3 py-1.5 border border-border/80 text-sm text-foreground hover:border-accent hover:text-accent transition-colors"
                     >
                       {item}
                     </motion.span>

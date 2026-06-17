@@ -13,19 +13,37 @@ const contactSchema = z.object({
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-let redis: Redis | null = null;
-if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-  try {
-    redis = Redis.fromEnv();
-  } catch {
-    redis = null;
+// Build the CSRF origin allow-list. Includes localhost in dev and any
+// Vercel preview deployment (*.vercel.app) when running in a preview env.
+function getAllowedOrigins(): string[] {
+  const origins: string[] = ["https://daniel-est.vercel.app"];
+  if (process.env.NODE_ENV === "development") {
+    origins.push("http://localhost:3000");
   }
+  // Preview deployments use https://<project>-<hash>-<team>.vercel.app.
+  if (process.env.VERCEL_ENV === "preview") {
+    origins.push("https://*.vercel.app");
+  }
+  return origins;
 }
 
-const ALLOWED_ORIGINS = [
-  "https://daniel-est.vercel.app",
-  ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
-];
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  const allowed = getAllowedOrigins();
+  return allowed.some((entry) => {
+    if (entry.includes("*")) {
+      // Convert the simple wildcard "https://*.vercel.app" into a regex.
+      const re = new RegExp("^" + entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") + "$");
+      return re.test(origin);
+    }
+    return entry === origin;
+  });
+}
+
+// Fail closed: if rate-limit env vars are missing, refuse traffic rather
+// than silently allow unlimited submissions through Resend.
+const hasRedisConfig = Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+const redis: Redis | null = hasRedisConfig ? Redis.fromEnv() : null;
 
 function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get("x-forwarded-for");
@@ -33,16 +51,22 @@ function getClientIp(req: NextRequest): string {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    // CSRF origin check
-    const origin = req.headers.get("origin");
-    if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
-      return NextResponse.json(
-        { success: false, error: "Forbidden" },
-        { status: 403 }
-      );
-    }
+  // CSRF defense: allow-list + same-origin check. Defense in depth — also
+  // reject when sec-fetch-site says the request is cross-site.
+  const origin = req.headers.get("origin");
+  const secFetchSite = req.headers.get("sec-fetch-site");
+  if (!isAllowedOrigin(origin) || secFetchSite === "cross-site") {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
 
+  if (!redis) {
+    return NextResponse.json(
+      { success: false, error: "Contact form temporarily unavailable." },
+      { status: 503 }
+    );
+  }
+
+  try {
     const body = await req.json();
     const parsed = contactSchema.safeParse(body);
 
@@ -57,23 +81,25 @@ export async function POST(req: NextRequest) {
     const ip = getClientIp(req);
     const rateKey = `contact:${ip}`;
 
-    if (redis) {
-      const attempts = await redis.get(rateKey);
-      if (attempts && Number(attempts) >= 3) {
-        return NextResponse.json(
-          { success: false, error: "Too many messages. Please try again later." },
-          { status: 429 }
-        );
-      }
-      // Use pipeline for atomic incr + expire to prevent TTL-less keys on crash
-      const pipeline = redis.pipeline();
-      pipeline.incr(rateKey);
-      pipeline.expire(rateKey, 900);
-      await pipeline.exec();
+    const attempts = await redis.get(rateKey);
+    if (attempts && Number(attempts) >= 3) {
+      return NextResponse.json(
+        { success: false, error: "Too many messages. Please try again later." },
+        { status: 429 }
+      );
     }
+
+    // Use a pipeline for atomic incr + expire so a crash mid-pipeline
+    // can't leave a TTL-less key.
+    const pipeline = redis.pipeline();
+    pipeline.incr(rateKey);
+    pipeline.expire(rateKey, 900);
+    await pipeline.exec();
 
     if (!resend) {
       console.warn("Contact form: RESEND_API_KEY not configured, email not sent.");
+      // Roll back the rate counter so the user isn't penalized for our misconfig.
+      await redis.decr(rateKey);
       return NextResponse.json(
         { success: false, error: "Email service is not configured. Please try again later." },
         { status: 503 }
@@ -82,7 +108,9 @@ export async function POST(req: NextRequest) {
 
     const toEmail = process.env.TO_EMAIL || personalInfo.email;
 
-    await resend.emails.send({
+    // Resend returns { data, error } instead of throwing. Roll back the
+    // counter on failure so the user can retry immediately.
+    const { error } = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
       to: [toEmail],
       subject: `[Portfolio] ${subject}`,
@@ -90,9 +118,18 @@ export async function POST(req: NextRequest) {
       replyTo: email,
     });
 
+    if (error) {
+      console.error("Resend send failed:", error);
+      await redis.decr(rateKey);
+      return NextResponse.json(
+        { success: false, error: "Failed to send message. Please try again." },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json({ success: true, message: "Message sent successfully." });
   } catch (error) {
-    console.error("Contact form error:", error);
+    console.error("Contact form error:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       { success: false, error: "Something went wrong. Please try again later." },
       { status: 500 }

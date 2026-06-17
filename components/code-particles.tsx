@@ -53,6 +53,10 @@ export function CodeParticles() {
     let raf: number;
     let w = 0;
     let h = 0;
+    // Visibility flag — closure-mutable, not a React state, so the rAF
+    // loop reads it on every frame without re-rendering. The hero canvas
+    // is off-screen for most of the page; pausing avoids wasted GPU work.
+    let isVisible = true;
 
     function resize() {
       if (!canvas) return;
@@ -70,29 +74,33 @@ export function CodeParticles() {
 
     function draw() {
       if (!ctx) return;
-      ctx.clearRect(0, 0, w, h);
+      // Skip the heavy clear+draw+particle-step pass when the canvas isn't
+      // visible. Schedule the next frame regardless so we resume promptly
+      // once the hero scrolls back into view.
+      if (isVisible) {
+        ctx.clearRect(0, 0, w, h);
 
-      // Detect dark mode from :root class
-      const isDark = document.documentElement.classList.contains("dark");
-      const baseColor = isDark ? "245,244,240" : "26,26,26";
+        // Detect dark mode from :root class
+        const isDark = document.documentElement.classList.contains("dark");
+        const baseColor = isDark ? "245,244,240" : "26,26,26";
 
-      ctx.fontKerning = "none";
+        ctx.fontKerning = "none";
 
-      for (const p of particles) {
-        ctx.font = `${p.size}px "JetBrains Mono", "Fira Mono", monospace`;
-        ctx.fillStyle = `rgba(${baseColor},${p.alpha})`;
-        ctx.fillText(p.token, p.x, p.y);
+        for (const p of particles) {
+          ctx.font = `${p.size}px "JetBrains Mono", "Fira Mono", monospace`;
+          ctx.fillStyle = `rgba(${baseColor},${p.alpha})`;
+          ctx.fillText(p.token, p.x, p.y);
 
-        p.x += p.vx;
-        p.y += p.vy;
+          p.x += p.vx;
+          p.y += p.vy;
 
-        // Wrap around edges
-        if (p.y > h + 20) { p.y = -20; p.x = Math.random() * w; }
-        if (p.y < -20) { p.y = h + 20; }
-        if (p.x > w + 60) { p.x = -60; }
-        if (p.x < -60) { p.x = w + 60; }
+          // Wrap around edges
+          if (p.y > h + 20) { p.y = -20; p.x = Math.random() * w; }
+          if (p.y < -20) { p.y = h + 20; }
+          if (p.x > w + 60) { p.x = -60; }
+          if (p.x < -60) { p.x = w + 60; }
+        }
       }
-
       raf = requestAnimationFrame(draw);
     }
 
@@ -104,9 +112,23 @@ export function CodeParticles() {
     });
     ro.observe(canvas);
 
+    // Pause the rAF work when the hero is out of view. The 200px rootMargin
+    // keeps the loop running briefly while the canvas is just barely
+    // off-screen, so re-entry feels instantaneous.
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          isVisible = entry.isIntersecting;
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    io.observe(canvas);
+
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      io.disconnect();
     };
   }, []);
 

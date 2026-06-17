@@ -49,7 +49,7 @@ export default function ContactPage() {
               </p>
             </MotionWrapper>
 
-            <MotionWrapper delay={0.1}>
+            <MotionWrapper>
               <ContactForm />
             </MotionWrapper>
 
