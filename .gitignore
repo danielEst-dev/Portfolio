@@ -20,6 +20,9 @@
 # production
 /build
 
+# react-email dev server build output (from `npm run email:build`)
+/.react-email/
+
 # misc
 .DS_Store
 *.pem

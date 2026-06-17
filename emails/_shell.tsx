@@ -21,7 +21,7 @@ const bodyStyle = {
   fontFamily: SANS_STACK,
   color: TOKENS.FG,
   margin: 0,
-  padding: "32px 16px",
+  padding: "40px 16px",
   WebkitTextSizeAdjust: "100%",
 } as const;
 
@@ -29,9 +29,9 @@ const containerStyle = {
   backgroundColor: TOKENS.BG,
   border: `1px solid ${TOKENS.BORDER}`,
   borderRadius: 6,
-  maxWidth: 560,
+  maxWidth: 540,
   margin: "0 auto",
-  padding: 36,
+  padding: 32,
 } as const;
 
 const nameStyle = {
@@ -198,7 +198,7 @@ export const labelStyle = {
   fontFamily: SANS_STACK,
   fontSize: 11,
   fontWeight: 500,
-  letterSpacing: "0.18em",
+  letterSpacing: "0.14em",
   textTransform: "uppercase",
   color: TOKENS.MUTED,
   margin: 0,
@@ -206,7 +206,7 @@ export const labelStyle = {
 
 export const headingStyle = {
   fontFamily: SANS_STACK,
-  fontSize: 22,
+  fontSize: 20,
   fontWeight: 500,
   letterSpacing: "-0.01em",
   color: TOKENS.FG,
@@ -217,7 +217,7 @@ export const headingStyle = {
 export const bodyTextStyle = {
   fontFamily: SANS_STACK,
   fontSize: 15,
-  lineHeight: 1.6,
+  lineHeight: 1.65,
   color: TOKENS.FG,
   margin: 0,
 } as const;
@@ -225,12 +225,12 @@ export const bodyTextStyle = {
 export const mutedTextStyle = {
   fontFamily: SANS_STACK,
   fontSize: 14,
-  lineHeight: 1.6,
+  lineHeight: 1.65,
   color: TOKENS.MUTED,
   margin: 0,
 } as const;
 
-export const sectionSpacing = { margin: "24px 0" } as const;
+export const sectionSpacing = { margin: "20px 0" } as const;
 
 // Definition-list row: a muted uppercase label on the left, the value on the right.
 export function MetaRow({
@@ -298,7 +298,7 @@ export function PrimaryButton({ href, children }: { href: string; children: Reac
         color: TOKENS.BG,
         borderRadius: 0,
         border: `1px solid ${TOKENS.FG}`,
-        padding: "12px 22px",
+        padding: "11px 20px",
         fontFamily: SANS_STACK,
         fontSize: 14,
         fontWeight: 500,

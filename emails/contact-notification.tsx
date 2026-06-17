@@ -57,7 +57,7 @@ export default function ContactNotification({
   const replyHref = `mailto:${email}?subject=${encodeURIComponent(`Re: ${subject}`)}`;
 
   return (
-    <EmailShell preview={`New message from ${name}: ${subject}`}>
+    <EmailShell preview={`${name} — ${subject}`}>
       <Section style={sectionSpacing}>
         <Text style={labelStyle}>New message · Portfolio contact</Text>
       </Section>
@@ -72,8 +72,8 @@ export default function ContactNotification({
           backgroundColor: TOKENS.CANVAS,
           border: `1px solid ${TOKENS.BORDER}`,
           borderRadius: 6,
-          padding: "4px 20px",
-          marginTop: 24,
+          padding: "6px 20px",
+          marginTop: 20,
         }}
       >
         <MetaRow label="From">{name}</MetaRow>
@@ -87,16 +87,28 @@ export default function ContactNotification({
         </MetaRow>
       </Section>
 
-      <Section style={{ marginTop: 28 }}>
-        <Text style={{ ...labelStyle, marginBottom: 12 }}>Message</Text>
+      <Section style={{ marginTop: 24 }}>
+        <Text style={{ ...labelStyle, marginBottom: 10 }}>Message</Text>
         <Section style={{ borderLeft: `2px solid ${TOKENS.ACCENT}`, paddingLeft: 16 }}>
           <MessageBody text={message} />
         </Section>
       </Section>
 
-      <Section style={{ marginTop: 32 }}>
+      <Section style={{ marginTop: 32, paddingBottom: 16 }}>
         <PrimaryButton href={replyHref}>Reply to {firstName(name)} →</PrimaryButton>
       </Section>
     </EmailShell>
   );
 }
+
+// Sample props used by `react-email`'s dev server. Edit a template and the
+// preview re-renders instantly with these values. Ignored at runtime by the
+// production route handler (which always passes real form data).
+ContactNotification.PreviewProps = {
+  name: "Jane Doe",
+  email: "jane.doe@example.com",
+  subject: "Project inquiry — backend consulting",
+  message:
+    "Hi Daniel,\n\nI came across your portfolio and was impressed by the system-design work on your projects page. I'd love to chat about a 6-week engagement to audit and harden our payments service.\n\nA few specifics:\n- Rate-limit strategy under flash crowds\n- Idempotency on the retry path\n- Observability for the reconciliation job\n\nAre you open to a 30-min call next week?\n\n— Jane",
+  submittedAt: "2026-06-17T16:30:00.000Z",
+};
