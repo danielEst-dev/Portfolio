@@ -88,8 +88,6 @@ export const projects = [
       "The application features an Express.js backend, an HTML5/Bootstrap frontend, and a modular MVC-inspired architecture. It integrates REST APIs, PostgreSQL, Redis Cloud, Neon DB, Nodemailer, and PDF generation to handle reservations, approvals, notifications, and reporting.",
     ],
     tags: ["Express.js", "PostgreSQL", "Bootstrap", "Redis"],
-    demoNote:
-      "A live demo of the admin panel is available on request — the credentials are not published on this site.",
     highlights: [
       "Digitized manual lending workflows into a web-based reservation system",
       "Built RESTful APIs with Express.js and PostgreSQL",
@@ -97,6 +95,10 @@ export const projects = [
       "Automated email notifications with Nodemailer",
       "Generated PDF reports for reservations and returns",
     ],
+    credentials: {
+      user: "admin@test.com",
+      pass: "admin123",
+    },
   },
   {
     slug: "hotel-booking",

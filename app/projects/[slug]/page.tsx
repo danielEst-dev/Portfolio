@@ -106,21 +106,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </ul>
                 </section>
 
-                {project.demoNote && (
+                {project.credentials && (
                   <section className="mb-12 p-5 border border-border bg-secondary/30">
                     <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
-                      Demo
+                      Admin Test Credentials
                     </h2>
-                    <p className="text-sm text-muted-foreground">
-                      {project.demoNote}{" "}
-                      <Link
-                        href="/contact"
-                        transitionTypes={["nav-forward"]}
-                        className="text-foreground underline underline-offset-4 hover:text-accent transition-colors"
-                      >
-                        Request access
-                      </Link>
-                    </p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">User</span>
+                        <span className="font-mono">{project.credentials.user}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Pass</span>
+                        <span className="font-mono">{project.credentials.pass}</span>
+                      </div>
+                    </div>
                   </section>
                 )}
               </div>

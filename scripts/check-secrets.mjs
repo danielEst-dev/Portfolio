@@ -15,8 +15,12 @@ const SECRETS = [
   { name: "Vercel OIDC token (eyJ...)", re: /eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/ },
   // Resend API keys
   { name: "Resend API key (re_...)", re: /re_[A-Za-z0-9]{24,}/ },
-  // Upstash Redis REST tokens
-  { name: "Upstash token (AX...)", re: /AX[A-Za-z0-9]{32,}/ },
+  // Upstash Redis REST tokens. Require an assignment/value boundary
+  // (start of line, whitespace, `=`, or quote) on each side so we don't
+  // match `AX` substrings inside base64-encoded `sha512-` integrity
+  // hashes in package-lock.json. Real tokens also use `_` and `-` in
+  // the body, so the character class includes those.
+  { name: "Upstash token (AX...)", re: /(?:^|[="'\s])AX[A-Za-z0-9_-]{32,}(?:["'\s]|$)/m },
   // GitHub personal access tokens (classic and fine-grained)
   { name: "GitHub PAT (ghp_/gho_/ghu_/ghs_/ghr_)", re: /gh[pousr]_[A-Za-z0-9]{36,}/ },
   // AWS access key IDs
