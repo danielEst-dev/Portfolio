@@ -78,7 +78,7 @@ export default function ProjectsPage() {
                         ))}
                       </div>
                       <div className="flex items-center justify-end">
-                        <ArrowRight className="h-5 w-5 text-muted-foreground transition-all group-hover:text-foreground group-hover:translate-x-1" />
+                        <ArrowRight className="h-5 w-5 text-muted-foreground transition-all group-hover:text-foreground" />
                       </div>
                     </div>
                   </Link>
