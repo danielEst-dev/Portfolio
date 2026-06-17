@@ -240,6 +240,8 @@ body::before {
   to   { width: 40px; }
 }
 
+/* Top accent rule — handled inline in projects/page.tsx */
+
 /* Arrow nudge — subtle infinite right-push for CTA arrows */
 .arrow-nudge {
   animation: arrow-nudge 2s ease-in-out infinite;

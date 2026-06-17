@@ -55,9 +55,13 @@ export default function ProjectsPage() {
                 <MotionWrapper key={project.slug} delay={index * 0.08}>
                   <Link
                     href={`/projects/${project.slug}`}
-                    className="group block py-8 md:py-10 border-b border-border transition-colors hover:bg-secondary/20"
+                    className="group relative block py-8 md:py-10 border-b border-border"
                     style={{ viewTransitionName: `project-${project.slug}` }}
                   >
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-accent origin-left scale-x-0 transition-transform duration-[450ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-x-100 z-10"
+                    />
                     <div className="grid md:grid-cols-[1fr_220px_80px] gap-6 md:gap-8 items-start">
                       <div>
                         <h2 className="text-2xl md:text-3xl font-medium text-foreground mb-2 group-hover:text-accent transition-colors">
