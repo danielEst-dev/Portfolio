@@ -15,7 +15,7 @@ const csp = [
   `default-src 'self'`,
   `script-src ${scriptSrc}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' blob: data:`,
+  `img-src 'self' blob: data: https://avatars.githubusercontent.com`,
   `font-src 'self'`,
   `connect-src 'self'`,
   `object-src 'none'`,

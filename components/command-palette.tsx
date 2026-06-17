@@ -24,6 +24,7 @@ import {
   Wrench,
   MessageSquare,
   Command,
+  Github,
 } from "lucide-react";
 
 const sectionLinks = [
@@ -31,6 +32,7 @@ const sectionLinks = [
   { href: "/#projects", label: "Featured Projects", icon: Briefcase },
   { href: "/#skills", label: "Technical Skills", icon: Wrench },
   { href: "/#certifications", label: "Certifications", icon: Award },
+  { href: "/#github", label: "GitHub Activity", icon: Github },
   { href: "/#contact", label: "Contact", icon: MessageSquare },
 ];
 

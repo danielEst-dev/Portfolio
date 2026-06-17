@@ -10,10 +10,10 @@ import { MagneticLink } from "@/components/magnetic-link";
 export function ContactCta() {
   return (
     <section id="contact" className="py-20 md:py-28 relative overflow-hidden">
-      <SectionNumber className="top-1/2 left-0 -translate-x-1/4 -translate-y-1/2">06</SectionNumber>
+      <SectionNumber className="top-1/2 right-0 translate-x-1/3 -translate-y-1/2">07</SectionNumber>
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
-          <SectionLabel label="Get in Touch" number="06" />
+          <SectionLabel label="Get in Touch" number="07" />
         </MotionWrapper>
 
         <MotionWrapper delay={0.1}>

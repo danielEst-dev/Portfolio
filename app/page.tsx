@@ -5,6 +5,7 @@ import { About } from "@/components/sections/about";
 import { FeaturedProjects } from "@/components/sections/featured-projects";
 import { Skills } from "@/components/sections/skills";
 import { Certifications } from "@/components/sections/certifications";
+import { GitHubActivity } from "@/components/sections/github-activity";
 import { ContactCta } from "@/components/sections/contact-cta";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
         <FeaturedProjects />
         <Skills />
         <Certifications />
+        <GitHubActivity />
         <ContactCta />
       </main>
       <Footer />

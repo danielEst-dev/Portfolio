@@ -21,8 +21,11 @@ const SECRETS = [
   // hashes in package-lock.json. Real tokens also use `_` and `-` in
   // the body, so the character class includes those.
   { name: "Upstash token (AX...)", re: /(?:^|[="'\s])AX[A-Za-z0-9_-]{32,}(?:["'\s]|$)/m },
-  // GitHub personal access tokens (classic and fine-grained)
+  // GitHub personal access tokens — classic (next line) and fine-grained (after it)
   { name: "GitHub PAT (ghp_/gho_/ghu_/ghs_/ghr_)", re: /gh[pousr]_[A-Za-z0-9]{36,}/ },
+  // GitHub fine-grained personal access tokens (github_pat_...). The body is
+  // base64url, so it can include '-' and '_' as well as alphanumerics.
+  { name: "GitHub fine-grained PAT (github_pat_...)", re: /github_pat_[A-Za-z0-9_-]{30,}/ },
   // AWS access key IDs
   { name: "AWS access key (AKIA...)", re: /AKIA[0-9A-Z]{16}/ },
 ];

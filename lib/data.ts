@@ -10,7 +10,7 @@ export const personalInfo = {
   email: "daniel.anth.est.03@gmail.com",
   location: "Meycauayan City, Bulacan",
   linkedin: "https://linkedin.com/in/daniel-est",
-  github: "https://github.com/daniel-est",
+  github: "https://github.com/danielEst-dev",
 };
 
 export const experiences = [
@@ -80,7 +80,7 @@ export const projects = [
     date: "Oct 2024 — Dec 2024",
     link: "https://ceu-vault.vercel.app",
     adminLink: "https://ceu-vault.vercel.app/admin",
-    repo: "https://github.com/daniel-est/CEUVault-Redis",
+    repo: "https://github.com/danielEst-dev/CEUVault-Redis",
     shortDescription:
       "Full-stack equipment reservation system digitizing a manual pen-and-paper lending facility. Express backend, Bootstrap frontend, PostgreSQL and Redis.",
     fullDescription: [
@@ -106,7 +106,7 @@ export const projects = [
     name: "Hotel Booking System",
     role: "Full Stack Developer",
     date: "2026",
-    repo: "https://github.com/daniel-est/hotel_booking",
+    repo: "https://github.com/danielEst-dev/hotel_booking",
     shortDescription:
       "Solo-built full-stack hotel management system with a 15-endpoint REST API, Bootstrap dashboard, and automated cron jobs.",
     fullDescription: [

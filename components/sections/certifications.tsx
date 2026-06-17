@@ -24,8 +24,8 @@ const listItem = {
 
 export function Certifications() {
   return (
-    <section id="certifications" className="py-20 md:py-28 bg-secondary/30 relative overflow-hidden">
-      <SectionNumber className="bottom-0 right-0 translate-x-1/4 translate-y-1/4">05</SectionNumber>
+    <section id="certifications" className="pt-20 md:pt-28 pb-12 md:pb-16 bg-secondary/30 relative overflow-hidden">
+      <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">05</SectionNumber>
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Certifications" number="05" />
@@ -37,6 +37,7 @@ export function Certifications() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-60px" }}
+          transition={{ delayChildren: 0.15 }}
         >
           {certifications.map((cert) => (
             <motion.div key={cert.name} variants={listItem}>

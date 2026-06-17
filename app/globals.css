@@ -180,7 +180,12 @@ body::before {
   height: 8px;
   border-color: var(--accent);
   opacity: 0.6;
-  transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* Limited to the properties that actually animate on hover. Excluding
+     border-color keeps theme switches from triggering a 0.35s transition on
+     10+ pseudo-elements at once (which visibly slows the home page). */
+  transition: opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              height 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .corner-bracket::before {
   top: -1px;
@@ -297,7 +302,13 @@ body,
 .bg-secondary,
 .bg-card,
 .bg-popover {
-  transition-property: background-color, border-color, color, fill, stroke;
+  /* Theme switch: crossfade text and accent colors. Borders and backgrounds
+     snap — animating `border-color` is expensive when the new value uses an
+     alpha channel (dark-mode border is `rgba(...)`), and the home page alone
+     carries 300+ `bg-accent/*` and `border-border/60` elements whose
+     simultaneous transitions visibly stall the toggle. The visible cue
+     (text color) still crossfades, so the theme switch reads as smooth. */
+  transition-property: color, fill, stroke;
   transition-duration: 180ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
