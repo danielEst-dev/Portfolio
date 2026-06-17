@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
 import { Redis } from "@upstash/redis";
+import { render, toPlainText } from "react-email";
+import { jsx } from "react/jsx-runtime";
 import { personalInfo } from "@/lib/data";
+import ContactNotification from "@/emails/contact-notification";
+import ContactAutoReply from "@/emails/contact-auto-reply";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required").max(100),
@@ -108,13 +112,32 @@ export async function POST(req: NextRequest) {
 
     const toEmail = process.env.TO_EMAIL || personalInfo.email;
 
+    // Render the branded HTML notification. render() is async (internal dynamic
+    // import) and can throw on a template error — wrap it so we can roll back
+    // the rate counter and not penalize the user for our rendering failure.
+    const submittedAt = new Date().toISOString();
+    let notifHtml: string;
+    try {
+      notifHtml = await render(
+        jsx(ContactNotification, { name, email, subject, message, submittedAt })
+      );
+    } catch (renderError) {
+      console.error("Contact form render failed:", renderError);
+      await redis.decr(rateKey);
+      return NextResponse.json(
+        { success: false, error: "Failed to send message. Please try again." },
+        { status: 502 }
+      );
+    }
+
     // Resend returns { data, error } instead of throwing. Roll back the
     // counter on failure so the user can retry immediately.
     const { error } = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
       to: [toEmail],
       subject: `[Portfolio] ${subject}`,
-      text: `From: ${name} <${email}>\n\n${message}`,
+      html: notifHtml,
+      text: `From: ${name} <${email}>\nSubject: ${subject}\n\n${message}`,
       replyTo: email,
     });
 
@@ -125,6 +148,28 @@ export async function POST(req: NextRequest) {
         { success: false, error: "Failed to send message. Please try again." },
         { status: 502 }
       );
+    }
+
+    // Auto-reply to the submitter. Gated behind CONTACT_AUTOREPLY_FROM, which
+    // requires a verified custom sending domain in Resend — the shared
+    // onboarding@resend.dev sandbox can only deliver to the account owner, not
+    // arbitrary third-party addresses. A failure here must never fail the
+    // request, since the inbound notification already succeeded.
+    const autoreplyFrom = process.env.CONTACT_AUTOREPLY_FROM;
+    if (autoreplyFrom) {
+      try {
+        const autoHtml = await render(jsx(ContactAutoReply, { name, subject, message }));
+        await resend.emails.send({
+          from: autoreplyFrom,
+          to: [email],
+          subject: "Thanks for reaching out — Daniel Estrella",
+          html: autoHtml,
+          text: toPlainText(autoHtml),
+          replyTo: toEmail,
+        });
+      } catch (autoreplyError) {
+        console.error("Contact form auto-reply failed:", autoreplyError);
+      }
     }
 
     return NextResponse.json({ success: true, message: "Message sent successfully." });
