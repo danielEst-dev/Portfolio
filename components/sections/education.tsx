@@ -27,26 +27,30 @@ export function Education() {
         <MotionWrapper delay={0.1}>
           <div className="corner-bracket bg-secondary/50 border border-border/60 p-6 md:p-10">
             <div className="grid md:grid-cols-[1fr_auto] gap-8 md:gap-12 items-start">
+              {/* School info — leads the hierarchy on every breakpoint */}
               <div>
-                <h3 className="text-3xl md:text-4xl font-medium text-foreground mb-2">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-medium text-foreground mb-1 md:mb-2 leading-tight">
                   {education.school}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-1">{education.degree}</p>
                 <p className="text-xs text-muted-foreground">{education.year}</p>
               </div>
-              <div className="md:text-right">
+
+              {/* Honors + awards — separated by a hairline on mobile, flush
+                  right on desktop (unchanged from before) */}
+              <div className="md:text-right mt-6 pt-6 border-t border-border/60 md:mt-0 md:pt-0 md:border-t-0">
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-2">
                   Honors
                 </p>
-                <p className="text-3xl md:text-4xl font-medium text-accent mb-2">
+                <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-accent mb-2 leading-tight">
                   {education.honors}
                 </p>
                 <p className="text-sm text-muted-foreground mb-4">GWA 1.25</p>
-                <div className="flex flex-wrap gap-2 md:justify-end">
+                <div className="grid grid-cols-2 md:flex md:flex-wrap md:justify-end gap-2">
                   {homeAwards.map((award) => (
                     <span
                       key={award}
-                      className="text-[11px] text-muted-foreground border border-border/80 px-2 py-1"
+                      className="text-[11px] text-muted-foreground border border-border/80 px-2.5 py-1.5 text-center md:px-2 md:py-1 md:text-left"
                     >
                       {award}
                     </span>
