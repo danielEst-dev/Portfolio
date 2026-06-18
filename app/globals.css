@@ -205,6 +205,15 @@ body::before {
   height: 12px;
   opacity: 1;
 }
+/* Scroll-driven equivalent of the :hover rule above, for touch devices that
+   have no hover. A card flips data-active="true" when it enters the viewport's
+   central band (see components/sections/certifications.tsx). */
+.group[data-active="true"] .corner-bracket::before,
+.group[data-active="true"] .corner-bracket::after {
+  width: 12px;
+  height: 12px;
+  opacity: 1;
+}
 
 /* Large background numerals */
 .section-number {
