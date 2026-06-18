@@ -66,7 +66,7 @@ export function Hero() {
                 accessible name; the per-word motion spans are marked
                 aria-hidden so AT reads the headline as a single phrase. */}
             <motion.h1
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-foreground mb-8"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] tracking-tight text-foreground mb-8"
               variants={headlineContainer}
               initial="hidden"
               animate="show"
@@ -101,7 +101,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-            className="lg:pt-4 space-y-6 border-l border-border/60 pl-6"
+            className="grid grid-cols-2 gap-x-6 gap-y-5 lg:block lg:space-y-6 lg:pt-4 lg:border-l lg:border-border/60 lg:pl-6"
           >
             <div className="space-y-1">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">Name</p>
