@@ -6,6 +6,7 @@ import { SectionLabel } from "@/components/section-label";
 import { MotionWrapper } from "@/components/motion-wrapper";
 import { personalInfo, experiences, education, certifications, skills } from "@/lib/data";
 import { Download, ArrowUpRight } from "lucide-react";
+import { RichText } from "@/components/rich-text";
 
 const title = "Resume — Daniel Anthony S. Estrella";
 const description = "View the resume of Daniel Anthony S. Estrella, backend engineer and Magna Cum Laude graduate.";
@@ -86,7 +87,7 @@ export default function ResumePage() {
                           <span className="text-xs text-muted-foreground/50 font-medium min-w-[20px]">
                             {String(i + 1).padStart(2, "0")}
                           </span>
-                          <span>{bullet}</span>
+                          <span><RichText text={bullet} /></span>
                         </li>
                       ))}
                     </ul>

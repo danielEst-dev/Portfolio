@@ -157,11 +157,11 @@ export function GitHubActivity() {
   }, []);
 
   return (
-    <section id="github" className="pt-12 md:pt-16 pb-20 md:pb-28 bg-secondary/30 relative overflow-hidden">
-      <SectionNumber className="bottom-0 left-0 -translate-x-1/4 translate-y-1/4">06</SectionNumber>
+    <section id="github" className="pt-12 md:pt-16 pb-20 md:pb-28 relative overflow-hidden">
+      <SectionNumber className="bottom-0 left-0 -translate-x-1/4 translate-y-1/4">08</SectionNumber>
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
-          <SectionLabel label="GitHub Activity" number="06" />
+          <SectionLabel label="GitHub Activity" number="08" />
         </MotionWrapper>
 
         {status === "loading" && <Skeleton />}

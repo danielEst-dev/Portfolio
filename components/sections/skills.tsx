@@ -23,10 +23,10 @@ const tagItem = {
 export function Skills() {
   return (
     <section id="skills" className="py-20 md:py-28 relative overflow-hidden">
-      <SectionNumber className="top-0 left-0 -translate-x-1/4 -translate-y-1/4">04</SectionNumber>
+      <SectionNumber className="top-0 left-0 -translate-x-1/4 -translate-y-1/4">06</SectionNumber>
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
-          <SectionLabel label="Technical Skills" number="04" />
+          <SectionLabel label="Technical Skills" number="06" />
         </MotionWrapper>
 
         {/* Conveyor belt is purely visual — the duplicated list and

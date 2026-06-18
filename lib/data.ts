@@ -13,41 +13,39 @@ export const personalInfo = {
   github: "https://github.com/danielEst-dev",
 };
 
-export const experiences = [
+type Experience = {
+  company: string;
+  role: string;
+  date: string;
+  bullets: string[];
+  /** True for low-signal entries rendered as a quiet single line instead of an expandable card. */
+  muted?: boolean;
+  /** Tech + team-context chips shown under the role, visible even when collapsed. */
+  stack?: string[];
+};
+
+export const experiences: Experience[] = [
   {
     company: "Xentra Solutions, Inc.",
     role: "Junior Backend Developer",
     date: "September 2025 — Present",
+    stack: ["ASP.NET Core", "MariaDB", "Microservices", "JIRA"],
     bullets: [
-      "Led backend development for an upcoming product version, building over 130 RESTful API endpoints across the microservice ecosystem within 1.5 months.",
-      "Manages 7 microservice Git repositories, overseeing branch strategy, code integration, version control practices, and interservice RESTful API communication patterns.",
-      "Translates Figma designs into backend specifications and API contracts, deriving and confirming 130+ endpoint definitions and response shapes in coordination with client-side developers.",
-      "Coordinates with 4 client-side developers (2 Next.js, 2 mobile) to align API response shapes and payload structures, and collaborates with 2 QA testers to investigate and resolve backend bugs.",
-      "Designs and maintains dedicated relational database schemas per microservice, creating 10+ tables and modifying 7 existing ones to support new features aligned with client requirements.",
-      "Participates in Agile ceremonies including daily standups, managing tasks across Scrum and Kanban workflows in JIRA for sprint planning and progress tracking.",
+      "Led backend for an upcoming product version, shipping **130+ RESTful API endpoints** across the microservice ecosystem in 1.5 months.",
+      "Own branch strategy, version control, and interservice API contracts across **7 microservice repositories**.",
+      "Designed relational schemas per service — **10+ new tables, 7 modified** — translating Figma designs into API contracts with client-side developers.",
     ],
   },
   {
     company: "Xentra Solutions, Inc.",
     role: "Backend Developer Intern",
     date: "January 2025 — May 2025 · 500+ hours",
+    stack: ["ASP.NET Core", "C#", "RBAC"],
     bullets: [
-      "Studied a production-grade microservice ecosystem firsthand, gaining practical understanding of interservice REST API communication and API consumption patterns across distributed services.",
-      "Designed relational database schemas as part of structured training exercises, producing 5–10 tables with normalized relationships to model real-world business data.",
-      "Built 10–20 practice CRUD endpoints using ASP.NET Core (C#), applying interservice API consumption patterns to simulate real microservice communication flows.",
-      "Implemented Role-Based Access Control (RBAC) within a working codebase, configuring role definitions, permission scopes, and route-level authorization middleware.",
+      "Implemented **Role-Based Access Control** in a production codebase — roles, permission scopes, and route-level authorization middleware.",
+      "Built **10–20 CRUD endpoints** in ASP.NET Core modeling real interservice REST communication, with normalized schemas of 5–10 tables.",
     ],
-  },
-  {
-    company: "Centro Escolar University Malolos",
-    role: "Data Entry Intern",
-    date: "2025 · 50 Hours · Physical Plant & Facilities Department",
-    bullets: [
-      "Digitized manual pen-and-paper facility logs and records into structured Google Sheets spreadsheets, improving data accessibility and reducing retrieval time for department staff.",
-      "Ensured accuracy and consistency of encoded data by cross-referencing physical records, applying data validation practices throughout the digitization process.",
-      "Completed the required 50-hour institutional internship as part of the BS Information Technology curriculum, demonstrating reliability and attention to detail in a non-technical office environment.",
-    ],
-  },
+  }
 ];
 
 export const projects = [

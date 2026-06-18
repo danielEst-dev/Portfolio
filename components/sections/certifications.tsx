@@ -25,10 +25,10 @@ const listItem = {
 export function Certifications() {
   return (
     <section id="certifications" className="pt-20 md:pt-28 pb-12 md:pb-16 bg-secondary/30 relative overflow-hidden">
-      <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">05</SectionNumber>
+      <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">07</SectionNumber>
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
-          <SectionLabel label="Certifications" number="05" />
+          <SectionLabel label="Certifications" number="07" />
         </MotionWrapper>
 
         <motion.div

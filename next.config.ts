@@ -29,36 +29,48 @@ const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
   },
-  headers: async () => [
-    // Hashed static assets get a long, immutable cache. Match the path
-    // precisely so we don't accidentally cache /_next/image or other
-    // dynamic endpoints.
-    {
-      source: "/_next/static/(.*)",
-      headers: [
-        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-      ],
-    },
-    {
-      source: "/(.*)",
-      headers: [
-        { key: "X-Frame-Options", value: "DENY" },
-        { key: "X-Content-Type-Options", value: "nosniff" },
-        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        {
-          key: "Permissions-Policy",
-          value: "camera=(), microphone=(), geolocation=()",
-        },
-        // 2 years, preload-eligible.
-        {
-          key: "Strict-Transport-Security",
-          value: "max-age=63072000; includeSubDomains; preload",
-        },
-        { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-        { key: "Content-Security-Policy", value: csp },
-      ],
-    },
-  ],
+  headers: async () => {
+    // Hashed static assets get a long, immutable cache in production so
+    // repeat visits skip the network. In dev we MUST NOT set this — Next.js
+    // recompiles client bundles on every request, and an immutable cache
+    // header on /_next/static/* causes the browser to keep serving the
+    // prior bundle after a source change, which manifests as React
+    // hydration mismatches on edited sections. See the startup warning:
+    //   "Custom Cache-Control headers detected for /_next/static/(.*)".
+    const staticAssetHeaders = isDev
+      ? []
+      : [
+          {
+            source: "/_next/static/(.*)",
+            headers: [
+              { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+            ],
+          },
+        ];
+
+    return [
+      ...staticAssetHeaders,
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+          // 2 years, preload-eligible.
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Content-Security-Policy", value: csp },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
