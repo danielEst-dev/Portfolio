@@ -73,7 +73,7 @@ export function Experience() {
                         {numeral}
                       </span>
 
-                      {/* Company · date · role · stack */}
+                      {/* Role · date · company · stack — role leads, company demoted */}
                       <div>
                         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5">
                           <h3
@@ -83,17 +83,18 @@ export function Experience() {
                                           ? "text-accent"
                                           : "text-foreground group-hover:text-accent"}`}
                           >
-                            {exp.company}
+                            {exp.role}
                           </h3>
-                          <span className="font-mono text-[10px] tracking-[0.04em] text-muted-foreground/50 ml-auto whitespace-nowrap">
+                          <span className="font-mono text-[10px] tracking-[0.04em] text-muted-foreground/50 md:ml-auto whitespace-nowrap">
                             {exp.date}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1 leading-snug">
-                          {exp.role}
+                        <p className="text-sm text-muted-foreground/70 mt-1 leading-snug">
+                          <span className="text-muted-foreground/45">at</span>{" "}
+                          {exp.company}
                         </p>
                         {exp.stack && exp.stack.length > 0 && (
-                          <p className="mt-2 font-mono text-[10px] tracking-[0.04em] text-muted-foreground/35">
+                          <p className="mt-2 font-mono text-[10px] tracking-[0.04em] text-muted-foreground/55">
                             {exp.stack.join(" / ")}
                           </p>
                         )}
@@ -117,7 +118,7 @@ export function Experience() {
                           {/* Indent aligns with the content column */}
                           <div className="pb-6 pl-[calc(28px+1rem)] md:pl-[calc(28px+1.25rem)]">
                             {/* Accent left-border — editorial pull-quote feel */}
-                            <div className="border-l border-accent/50 pl-5">
+                            <div className="border-l border-accent/50 pl-4 md:pl-5">
                               <motion.ul
                                 className="space-y-3"
                                 initial={prefersReducedMotion ? false : "hidden"}
