@@ -27,3 +27,23 @@ export function useIsMac() {
   }, []);
   return isMac;
 }
+
+/**
+ * Whether the current input can hover at all. Defaults to `true` during SSR
+ * and the first client render to avoid a hydration mismatch, then resolves to
+ * the real value in an effect. Touch devices report no hover, so callers drive
+ * the "active" highlight from scroll position there instead of relying on
+ * `:hover` (which has no equivalent on mobile). Used by the numbered-index
+ * sections (Certifications, Skills).
+ */
+export function useCanHover() {
+  const [canHover, setCanHover] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setCanHover(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+  return canHover;
+}
