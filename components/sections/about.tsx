@@ -9,14 +9,14 @@ import { CountUp } from "@/components/count-up";
 
 const statContainer = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.05, delayChildren: 0.15 } },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
 const statItem = {
-  hidden: { opacity: 0, x: -8 },
+  hidden: { opacity: 0, y: 8 },
   show: {
     opacity: 1,
-    x: 0,
+    y: 0,
     transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
   },
 };
@@ -30,54 +30,63 @@ export function About() {
           <SectionLabel label="About" number="02" />
         </MotionWrapper>
 
-        <div className="grid lg:grid-cols-[1fr_360px] gap-12 lg:gap-20 items-start">
-          <MotionWrapper delay={0.1}>
-            <div className="border-l-2 border-accent pl-6 md:pl-8">
-              <p className="text-2xl md:text-3xl font-medium leading-snug text-foreground mb-6">
-                Backend engineer focused on building reliable, scalable systems.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                {personalInfo.summary}
-              </p>
-            </div>
-          </MotionWrapper>
+        <MotionWrapper delay={0.1}>
+          <div className="border-l-2 border-accent pl-6 md:pl-8 max-w-3xl">
+            <p className="text-2xl md:text-3xl font-medium leading-snug text-foreground mb-6">
+              Backend engineer focused on building reliable, scalable systems.
+            </p>
+            {/* Trimmed intro on mobile, full summary on md+ */}
+            <p className="text-muted-foreground leading-relaxed md:hidden">
+              {personalInfo.shortBio}
+            </p>
+            <p className="hidden md:block text-muted-foreground leading-relaxed">
+              {personalInfo.summary}
+            </p>
+          </div>
+        </MotionWrapper>
 
-          <MotionWrapper delay={0.2}>
-            <div className="corner-bracket bg-secondary/50 border border-border/60 p-6 md:p-8">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
-                At a glance
-              </p>
-              <motion.div
-                className="space-y-4"
-                variants={statContainer}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "-40px" }}
-              >
-                <motion.div variants={statItem} className="flex justify-between items-baseline border-b border-border/60 pb-3">
-                  <span className="text-sm text-muted-foreground">Experience</span>
-                  <span className="text-sm font-medium text-foreground">Junior Backend Developer</span>
-                </motion.div>
-                <motion.div variants={statItem} className="flex justify-between items-baseline border-b border-border/60 pb-3">
-                  <span className="text-sm text-muted-foreground">Education</span>
-                  <span className="text-sm font-medium text-foreground">BS IT, Magna Cum Laude</span>
-                </motion.div>
-                <motion.div variants={statItem} className="flex justify-between items-baseline border-b border-border/60 pb-3">
-                  <span className="text-sm text-muted-foreground">APIs built</span>
-                  <span className="text-sm font-medium text-foreground">
-                    <CountUp to={300} suffix="+ endpoints" duration={1600} />
-                  </span>
-                </motion.div>
-                <motion.div variants={statItem} className="flex justify-between items-baseline">
-                  <span className="text-sm text-muted-foreground">Microservices</span>
-                  <span className="text-sm font-medium text-foreground">
-                    <CountUp to={7} suffix=" repositories" duration={900} />
-                  </span>
-                </motion.div>
-              </motion.div>
-            </div>
-          </MotionWrapper>
-        </div>
+        <MotionWrapper delay={0.2}>
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y divide-border/60 border border-border/60 corner-bracket bg-secondary/50 mt-10 md:mt-12"
+            variants={statContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-40px" }}
+          >
+            <motion.div variants={statItem} className="p-4 md:p-5">
+              <div className="text-2xl md:text-3xl font-semibold text-foreground tabular-nums">
+                <CountUp to={130} suffix="+" duration={1600} />
+              </div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                REST endpoints
+              </div>
+            </motion.div>
+            <motion.div variants={statItem} className="p-4 md:p-5">
+              <div className="text-2xl md:text-3xl font-semibold text-foreground tabular-nums">
+                <CountUp to={7} duration={900} />
+              </div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                Microservices
+              </div>
+            </motion.div>
+            <motion.div variants={statItem} className="p-4 md:p-5">
+              <div className="text-2xl md:text-3xl font-semibold text-foreground tabular-nums">
+                1.25
+              </div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                College GWA
+              </div>
+            </motion.div>
+            <motion.div variants={statItem} className="p-4 md:p-5">
+              <div className="text-2xl md:text-3xl font-semibold text-foreground">
+                Top 8
+              </div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                Overall graduate
+              </div>
+            </motion.div>
+          </motion.div>
+        </MotionWrapper>
       </div>
     </section>
   );
