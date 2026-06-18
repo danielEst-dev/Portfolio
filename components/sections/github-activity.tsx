@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { SectionLabel } from "@/components/section-label";
 import { SectionNumber } from "@/components/section-number";
@@ -22,6 +22,19 @@ const LEVEL_CLASS = [
   "bg-accent",
 ] as const;
 
+// Stacked composition-bar shades for the top-languages card. Strongest shade
+// goes to the most-used language so the bar reads as a ranked breakdown even
+// before the legend is scanned. Monochrome accent steps keep it on-brand with
+// the rest of the section.
+const LANG_BAR_CLASS = [
+  "bg-accent",
+  "bg-accent/80",
+  "bg-accent/60",
+  "bg-accent/45",
+  "bg-accent/30",
+  "bg-accent/20",
+] as const;
+
 type ActivityData = Extract<GitHubActivityPayload, { available: true }>;
 
 // Staggered reveal for inner lists. The "show" parent triggers children; the
@@ -39,13 +52,31 @@ const listItem = {
   },
 };
 
-function Stat({ label, value }: { label: string; value: ReactNode }) {
+function Stat({
+  label,
+  value,
+  hero,
+}: {
+  label: string;
+  value: ReactNode;
+  // Hero stat spans the full width of its row on mobile (see the stat grid),
+  // so it gets a larger value to read as a headline; on md+ it collapses back
+  // to the same size as the other four.
+  hero?: boolean;
+}) {
   return (
     <div className="bg-background p-5">
       <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-2">
         {label}
       </p>
-      <div className="text-2xl font-medium text-foreground tabular-nums">{value}</div>
+      <div
+        className={cn(
+          "font-medium text-foreground tabular-nums",
+          hero ? "text-3xl md:text-2xl" : "text-2xl"
+        )}
+      >
+        {value}
+      </div>
     </div>
   );
 }
@@ -81,15 +112,28 @@ function Skeleton() {
       <div className="grid md:grid-cols-2 gap-10">
         <div className="border border-border/60 p-5">
           <div className="h-3 w-24 bg-secondary mb-4" />
+          <div className="h-2 w-full bg-secondary rounded-full mb-5" />
           <div className="space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="h-3 w-full bg-secondary" />
             ))}
           </div>
+          <div className="h-3 w-48 bg-secondary mt-5" />
         </div>
-        <div className="space-y-3">
+        <div className="border border-border/60 p-5">
+          <div className="h-3 w-28 bg-secondary mb-4" />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-3 w-full bg-secondary" />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="mt-10">
+        <div className="h-3 w-32 bg-secondary mb-4" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="border border-border/60 p-5">
+            <div key={i} className="border border-border/60 p-5 h-24">
               <div className="h-4 w-32 bg-secondary mb-2" />
               <div className="h-3 w-full bg-secondary" />
             </div>
@@ -133,9 +177,71 @@ function formatMonthYear(iso: string): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" }).format(d);
 }
 
+// Short "Mon D" date for the best-day row of the activity card.
+function formatShortDate(iso: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(d);
+}
+
+// Derive an "activity rhythm" summary from the contribution calendar weeks,
+// which are already shipped to the client for the graph — so this adds no
+// payload and no extra API call. Runs only post-fetch, like the formatters above.
+const WEEKDAY_NAMES = [
+  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+] as const;
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+] as const;
+
+type ActivityRhythm = {
+  activeDays: number;
+  totalDays: number;
+  bestDay: { count: number; date: string } | null;
+  busiestWeekday: string | null;
+  busiestMonth: string | null;
+};
+
+function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
+  const weekdaySums = new Array(7).fill(0);
+  const monthSums = new Array(12).fill(0);
+  let activeDays = 0;
+  let totalDays = 0;
+  let bestDay: { count: number; date: string } | null = null;
+
+  for (const week of weeks) {
+    for (const day of week.days) {
+      totalDays += 1;
+      if (day.count > 0) activeDays += 1;
+      if (!bestDay || day.count > bestDay.count) bestDay = { count: day.count, date: day.date };
+      const d = new Date(day.date);
+      if (!Number.isNaN(d.getTime())) {
+        weekdaySums[d.getUTCDay()] += day.count;
+        monthSums[d.getUTCMonth()] += day.count;
+      }
+    }
+  }
+
+  const topWeekday = weekdaySums.reduce((best, v, i) => (v > weekdaySums[best] ? i : best), 0);
+  const topMonth = monthSums.reduce((best, v, i) => (v > monthSums[best] ? i : best), 0);
+
+  return {
+    activeDays,
+    totalDays,
+    bestDay: bestDay && bestDay.count > 0 ? bestDay : null,
+    busiestWeekday: weekdaySums[topWeekday] > 0 ? WEEKDAY_NAMES[topWeekday] : null,
+    busiestMonth: monthSums[topMonth] > 0 ? MONTH_NAMES[topMonth] : null,
+  };
+}
+
 export function GitHubActivity() {
   const [data, setData] = useState<ActivityData | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">("loading");
+
+  // Derived from the calendar weeks already in the payload — no extra fetch.
+  const rhythm = useMemo(() => (data ? computeActivityRhythm(data.weeks) : null), [data]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -233,8 +339,9 @@ export function GitHubActivity() {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ delayChildren: 0.1 }}
             >
-              <motion.div variants={listItem} className="bg-background">
+              <motion.div variants={listItem} className="bg-background col-span-2 md:col-span-1">
                 <Stat
+                  hero
                   label="Contributions"
                   value={<CountUp to={data.totalContributions} duration={1600} />}
                 />
@@ -317,13 +424,33 @@ export function GitHubActivity() {
               </div>
             </MotionWrapper>
 
-            <div className="grid md:grid-cols-2 gap-10">
-              {data.topLanguages.length > 0 && (
-                <MotionWrapper delay={0.23}>
-                  <div className="corner-bracket p-5 border border-border/60 h-full">
+            {/* Top languages + Activity rhythm — a balanced 2-col row that
+                always fills the width regardless of whether pinned repos
+                exist. Drops to a single column when there are no languages. */}
+            <div className={cn("grid gap-10", data.topLanguages.length > 0 && "md:grid-cols-2")}>
+                {data.topLanguages.length > 0 && (
+                  <MotionWrapper delay={0.23}>
+                    <div className="corner-bracket p-5 border border-border/60">
                     <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
                       Top languages
                     </p>
+                    {/* Stacked composition bar — a single segmented bar that
+                        summarizes the proportional split at a glance; the
+                        per-language list below acts as its legend/detail. Any
+                        gap on the right is "other" languages outside the top 6. */}
+                    <div className="flex h-2 rounded-full overflow-hidden bg-secondary mb-5">
+                      {data.topLanguages.map((l, i) => (
+                        <motion.div
+                          key={l.name}
+                          className={cn("h-full shrink-0", LANG_BAR_CLASS[i % LANG_BAR_CLASS.length])}
+                          initial={{ width: "0%" }}
+                          whileInView={{ width: `${l.percent}%` }}
+                          viewport={{ once: true, margin: "-60px" }}
+                          transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+                          title={`${l.name} · ${Math.round(l.percent)}%`}
+                        />
+                      ))}
+                    </div>
                     <motion.ul
                       className="space-y-3"
                       variants={listContainer}
@@ -354,14 +481,67 @@ export function GitHubActivity() {
                         </motion.li>
                       ))}
                     </motion.ul>
-                  </div>
-                </MotionWrapper>
-              )}
+                    <p className="text-[11px] font-mono text-muted-foreground mt-5 pt-4 border-t border-border/60">
+                      Across {data.publicRepos} public repos ·{" "}
+                      {data.topLanguages[0]?.name} leads at{" "}
+                      {Math.round(data.topLanguages[0]?.percent ?? 0)}%
+                    </p>
+                    </div>
+                  </MotionWrapper>
+                )}
+
+                  {rhythm && (
+                    <MotionWrapper delay={0.28}>
+                      <div className="corner-bracket p-5 border border-border/60">
+                        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                          Activity rhythm
+                        </p>
+                        <motion.ul
+                          className="space-y-3"
+                          variants={listContainer}
+                          initial="hidden"
+                          whileInView="show"
+                          viewport={{ once: true, margin: "-60px" }}
+                        >
+                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
+                            <span className="text-xs text-muted-foreground">Active days</span>
+                            <span className="text-xs font-mono text-foreground tabular-nums">
+                              {rhythm.activeDays} / {rhythm.totalDays}
+                            </span>
+                          </motion.li>
+                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
+                            <span className="text-xs text-muted-foreground">Best day</span>
+                            <span className="text-xs font-mono text-foreground tabular-nums">
+                              {rhythm.bestDay
+                                ? `${rhythm.bestDay.count} · ${formatShortDate(rhythm.bestDay.date)}`
+                                : "—"}
+                            </span>
+                          </motion.li>
+                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
+                            <span className="text-xs text-muted-foreground">Busiest weekday</span>
+                            <span className="text-xs font-mono text-foreground">
+                              {rhythm.busiestWeekday ?? "—"}
+                            </span>
+                          </motion.li>
+                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
+                            <span className="text-xs text-muted-foreground">Busiest month</span>
+                            <span className="text-xs font-mono text-foreground">
+                              {rhythm.busiestMonth ?? "—"}
+                            </span>
+                          </motion.li>
+                        </motion.ul>
+                      </div>
+                    </MotionWrapper>
+                  )}
+            </div>
 
               {data.pinnedRepos.length > 0 && (
-                <MotionWrapper delay={0.28}>
+                <MotionWrapper delay={0.33} className="mt-10">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                    Pinned repositories
+                  </p>
                   <motion.ul
-                    className="space-y-3"
+                    className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
                     variants={listContainer}
                     initial="hidden"
                     whileInView="show"
@@ -373,7 +553,7 @@ export function GitHubActivity() {
                           href={r.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="corner-bracket group block p-5 border border-border/60 hover:border-accent/60 transition-colors"
+                          className="corner-bracket group block h-full p-5 border border-border/60 hover:border-accent/60 transition-colors"
                         >
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors flex items-center gap-2">
@@ -410,7 +590,6 @@ export function GitHubActivity() {
                   </motion.ul>
                 </MotionWrapper>
               )}
-            </div>
 
             <MotionWrapper delay={0.33} className="mt-10 text-center">
               <Link
