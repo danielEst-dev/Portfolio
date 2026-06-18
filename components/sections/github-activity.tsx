@@ -1,7 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { SectionLabel } from "@/components/section-label";
 import { SectionNumber } from "@/components/section-number";
@@ -123,7 +134,7 @@ function Skeleton() {
         <div className="border border-border/60 p-5">
           <div className="h-3 w-28 bg-secondary mb-4" />
           <div className="space-y-3">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 7 }).map((_, i) => (
               <div key={i} className="h-3 w-full bg-secondary" />
             ))}
           </div>
@@ -185,6 +196,25 @@ function formatShortDate(iso: string): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(d);
 }
 
+// "Mon D, YYYY" for the contribution-cell tooltip.
+function formatCellDate(iso: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(d);
+}
+
+// Position a fixed tooltip above (or, if too close to the top, below) a cell
+// rect, clamping horizontally so it can't spill off the viewport edges.
+function positionTooltip(tip: HTMLElement, rect: DOMRect): void {
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
+  const placeBelow = rect.top < 64;
+  const left = Math.max(64, Math.min(rect.left + rect.width / 2, vw - 64));
+  tip.style.left = `${left}px`;
+  tip.style.top = placeBelow ? `${rect.bottom + 8}px` : `${rect.top - 8}px`;
+  tip.style.transform = placeBelow ? "translateX(-50%)" : "translateX(-50%) translateY(-100%)";
+}
+
 // Derive an "activity rhythm" summary from the contribution calendar weeks,
 // which are already shipped to the client for the graph — so this adds no
 // payload and no extra API call. Runs only post-fetch, like the formatters above.
@@ -196,31 +226,69 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ] as const;
 
+type Momentum = { pct: number | null; dir: "up" | "down" | "flat" };
+
 type ActivityRhythm = {
   activeDays: number;
   totalDays: number;
+  longestGap: number;
+  avgPerActiveDay: number | null;
   bestDay: { count: number; date: string } | null;
   busiestWeekday: string | null;
   busiestMonth: string | null;
+  momentum: Momentum | null;
 };
 
+// Format the momentum row as "↑ 23%" / "↓ 8%" / "flat" / "↑ new activity"
+// (the last when there was no activity in the prior window to compare to).
+function momentumLabel(m: Momentum): string {
+  if (m.pct === null) return m.dir === "up" ? "↑ new activity" : "flat";
+  if (m.pct === 0) return "flat";
+  return `${m.dir === "up" ? "↑" : "↓"} ${Math.abs(m.pct)}%`;
+}
+
 function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
+  const days = weeks.flatMap((w) => w.days);
+
   const weekdaySums = new Array(7).fill(0);
   const monthSums = new Array(12).fill(0);
   let activeDays = 0;
-  let totalDays = 0;
+  let totalContribs = 0;
   let bestDay: { count: number; date: string } | null = null;
 
-  for (const week of weeks) {
-    for (const day of week.days) {
-      totalDays += 1;
-      if (day.count > 0) activeDays += 1;
-      if (!bestDay || day.count > bestDay.count) bestDay = { count: day.count, date: day.date };
-      const d = new Date(day.date);
-      if (!Number.isNaN(d.getTime())) {
-        weekdaySums[d.getUTCDay()] += day.count;
-        monthSums[d.getUTCMonth()] += day.count;
-      }
+  for (const day of days) {
+    totalContribs += day.count;
+    if (day.count > 0) activeDays += 1;
+    if (!bestDay || day.count > bestDay.count) bestDay = { count: day.count, date: day.date };
+    const d = new Date(day.date);
+    if (!Number.isNaN(d.getTime())) {
+      weekdaySums[d.getUTCDay()] += day.count;
+      monthSums[d.getUTCMonth()] += day.count;
+    }
+  }
+
+  // Longest gap: longest run of zero-contribution days. Drop the final day if
+  // it's zero (today isn't over) so an in-progress day can't inflate the gap.
+  const gapDays =
+    days.length && days[days.length - 1].count === 0 ? days.slice(0, -1) : days;
+  let gapRun = 0;
+  let longestGap = 0;
+  for (const d of gapDays) {
+    if (d.count > 0) gapRun = 0;
+    else if ((gapRun += 1) > longestGap) longestGap = gapRun;
+  }
+
+  // Recent momentum: total of the last 30 days vs the 30 before that. Needs a
+  // 60-day window to be meaningful; otherwise leave it null.
+  let momentum: Momentum | null = null;
+  if (days.length >= 60) {
+    const last30 = days.slice(-30).reduce((s, d) => s + d.count, 0);
+    const prev30 = days.slice(-60, -30).reduce((s, d) => s + d.count, 0);
+    if (prev30 === 0) {
+      momentum = { pct: null, dir: last30 > 0 ? "up" : "flat" };
+    } else {
+      const pct = Math.round(((last30 - prev30) / prev30) * 100);
+      momentum = { pct, dir: pct > 0 ? "up" : pct < 0 ? "down" : "flat" };
     }
   }
 
@@ -229,10 +297,13 @@ function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
 
   return {
     activeDays,
-    totalDays,
+    totalDays: days.length,
+    longestGap,
+    avgPerActiveDay: activeDays > 0 ? Math.round((totalContribs / activeDays) * 10) / 10 : null,
     bestDay: bestDay && bestDay.count > 0 ? bestDay : null,
     busiestWeekday: weekdaySums[topWeekday] > 0 ? WEEKDAY_NAMES[topWeekday] : null,
     busiestMonth: monthSums[topMonth] > 0 ? MONTH_NAMES[topMonth] : null,
+    momentum,
   };
 }
 
@@ -242,6 +313,82 @@ export function GitHubActivity() {
 
   // Derived from the calendar weeks already in the payload — no extra fetch.
   const rhythm = useMemo(() => (data ? computeActivityRhythm(data.weeks) : null), [data]);
+
+  // ---- Contribution-cell tooltip (instant, themed) -------------------------
+  // Imperative tooltip updated on hover so sweeping across ~365 cells never
+  // triggers a React re-render. Portaled to <body> so it escapes the section's
+  // overflow-hidden and any transformed ancestors, and positions fixed to the
+  // viewport. `isClient` gates the portal to avoid an SSR/hydration mismatch.
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const tooltipCountRef = useRef<HTMLDivElement | null>(null);
+  const tooltipDateRef = useRef<HTMLDivElement | null>(null);
+
+  // ---- Custom mobile scroll (drag-to-scroll + themed thumb) ----------------
+  const mobileScrollRef = useRef<HTMLDivElement | null>(null);
+  const thumbRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef({ dragging: false, startX: 0, startScroll: 0 });
+
+  const showCell = (el: HTMLElement) => {
+    const tip = tooltipRef.current;
+    if (!tip || !tooltipCountRef.current || !tooltipDateRef.current) return;
+    const count = Number(el.dataset.count ?? 0);
+    tooltipCountRef.current.textContent = `${count} ${count === 1 ? "contribution" : "contributions"}`;
+    tooltipDateRef.current.textContent = formatCellDate(el.dataset.date ?? "");
+    positionTooltip(tip, el.getBoundingClientRect());
+    tip.style.opacity = "1";
+  };
+  const hideCell = () => {
+    if (tooltipRef.current) tooltipRef.current.style.opacity = "0";
+  };
+
+  const handleCellOver = (e: ReactMouseEvent) => {
+    if (dragRef.current.dragging) return;
+    const el = (e.target as HTMLElement).closest<HTMLElement>("[data-cell]");
+    if (el) showCell(el);
+  };
+  const handleCellLeave = () => hideCell();
+
+  const updateThumb = useCallback(() => {
+    const el = mobileScrollRef.current;
+    const thumb = thumbRef.current;
+    if (!el || !thumb) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const width = el.scrollWidth > 0 ? (el.clientWidth / el.scrollWidth) * 100 : 100;
+    const left = max > 0 ? (el.scrollLeft / max) * (100 - width) : 0;
+    thumb.style.left = `${left}%`;
+    thumb.style.width = `${width}%`;
+  }, []);
+
+  // Mouse-only drag-to-scroll; touch keeps native horizontal panning.
+  const handlePointerDown = (e: ReactPointerEvent) => {
+    if (e.pointerType !== "mouse") return;
+    const el = e.currentTarget as HTMLElement;
+    dragRef.current = { dragging: true, startX: e.clientX, startScroll: el.scrollLeft };
+    el.setPointerCapture(e.pointerId);
+    hideCell();
+  };
+  const handlePointerMove = (e: ReactPointerEvent) => {
+    if (!dragRef.current.dragging) return;
+    const el = e.currentTarget as HTMLElement;
+    el.scrollLeft = dragRef.current.startScroll - (e.clientX - dragRef.current.startX);
+  };
+  const handlePointerUp = (e: ReactPointerEvent) => {
+    if (!dragRef.current.dragging) return;
+    const el = e.currentTarget as HTMLElement;
+    dragRef.current.dragging = false;
+    if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
+  };
+
+  useEffect(() => {
+    updateThumb();
+    window.addEventListener("resize", updateThumb);
+    return () => window.removeEventListener("resize", updateThumb);
+  }, [updateThumb, data]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -371,26 +518,51 @@ export function GitHubActivity() {
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
                   Contribution graph · last 12 months
                 </p>
-                {/* Mobile (<md): fixed-size cells scroll horizontally. */}
-                <div className="md:hidden overflow-x-auto pb-2">
-                  <div className="flex gap-[3px] w-max">
-                    {data.weeks.map((week, wi) => (
-                      <div
-                        key={week.days[0]?.date ?? wi}
-                        className="grid grid-rows-7 gap-[3px]"
-                      >
-                        {week.days.map((d) => (
-                          <div
-                            key={d.date}
-                            title={`${d.date} · ${d.count} contribution${d.count === 1 ? "" : "s"}`}
-                            className={cn(
-                              "size-[10px] rounded-[2px]",
-                              LEVEL_CLASS[d.level]
-                            )}
-                          />
-                        ))}
-                      </div>
-                    ))}
+                {/* Mobile (<md): fixed-size cells in a custom drag-to-scroll
+                    track with a themed thumb indicator. Native scrollbar is
+                    hidden; touch still pans natively, mouse drags to scroll. */}
+                <div className="md:hidden">
+                  <div
+                    ref={mobileScrollRef}
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
+                    onScroll={updateThumb}
+                    className="overflow-x-auto cursor-grab active:cursor-grabbing select-none [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [touch-action:pan-x]"
+                  >
+                    <div
+                      className="flex gap-[3px] w-max"
+                      onMouseOver={handleCellOver}
+                      onMouseLeave={handleCellLeave}
+                    >
+                      {data.weeks.map((week, wi) => (
+                        <div
+                          key={week.days[0]?.date ?? wi}
+                          className="grid grid-rows-7 gap-[3px]"
+                        >
+                          {week.days.map((d) => (
+                            <div
+                              key={d.date}
+                              data-cell
+                              data-date={d.date}
+                              data-count={d.count}
+                              className={cn(
+                                "size-[10px] rounded-[2px]",
+                                LEVEL_CLASS[d.level]
+                              )}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-3 h-1 bg-secondary rounded-full relative" aria-hidden="true">
+                    <div
+                      ref={thumbRef}
+                      className="absolute top-0 h-full bg-accent rounded-full"
+                      style={{ left: "0%", width: "100%" }}
+                    />
                   </div>
                 </div>
                 {/* md+: cells stretch edge-to-edge via a fixed 53-column grid.
@@ -398,12 +570,16 @@ export function GitHubActivity() {
                 <div
                   className="hidden md:grid gap-[3px]"
                   style={{ gridTemplateColumns: "repeat(53, minmax(0, 1fr))" }}
+                  onMouseOver={handleCellOver}
+                  onMouseLeave={handleCellLeave}
                 >
                   {data.weeks.flatMap((week, wi) =>
                     week.days.map((d, di) => (
                       <motion.div
                         key={d.date}
-                        title={`${d.date} · ${d.count} contribution${d.count === 1 ? "" : "s"}`}
+                        data-cell
+                        data-date={d.date}
+                        data-count={d.count}
                         className={cn(
                           "aspect-square w-full rounded-[2px]",
                           LEVEL_CLASS[d.level]
@@ -504,9 +680,21 @@ export function GitHubActivity() {
                           viewport={{ once: true, margin: "-60px" }}
                         >
                           <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Active days</span>
+                            <span className="text-xs text-muted-foreground">Days active</span>
                             <span className="text-xs font-mono text-foreground tabular-nums">
-                              {rhythm.activeDays} / {rhythm.totalDays}
+                              {rhythm.activeDays} days
+                            </span>
+                          </motion.li>
+                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
+                            <span className="text-xs text-muted-foreground">Longest gap</span>
+                            <span className="text-xs font-mono text-foreground tabular-nums">
+                              {rhythm.longestGap} days
+                            </span>
+                          </motion.li>
+                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
+                            <span className="text-xs text-muted-foreground">Avg / active day</span>
+                            <span className="text-xs font-mono text-foreground tabular-nums">
+                              {rhythm.avgPerActiveDay ?? "—"}
                             </span>
                           </motion.li>
                           <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
@@ -527,6 +715,12 @@ export function GitHubActivity() {
                             <span className="text-xs text-muted-foreground">Busiest month</span>
                             <span className="text-xs font-mono text-foreground">
                               {rhythm.busiestMonth ?? "—"}
+                            </span>
+                          </motion.li>
+                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
+                            <span className="text-xs text-muted-foreground">Recent momentum</span>
+                            <span className="text-xs font-mono text-foreground tabular-nums">
+                              {rhythm.momentum ? momentumLabel(rhythm.momentum) : "—"}
                             </span>
                           </motion.li>
                         </motion.ul>
@@ -602,6 +796,24 @@ export function GitHubActivity() {
                 View full GitHub profile
               </Link>
             </MotionWrapper>
+
+            {isClient &&
+              createPortal(
+                <div
+                  ref={tooltipRef}
+                  className="fixed z-50 pointer-events-none opacity-0"
+                  style={{ opacity: 0 }}
+                >
+                  <div className="bg-background border border-border shadow-sm rounded px-2 py-1 text-center whitespace-nowrap">
+                    <div
+                      ref={tooltipCountRef}
+                      className="text-[11px] font-mono text-foreground tabular-nums"
+                    />
+                    <div ref={tooltipDateRef} className="text-[10px] text-muted-foreground" />
+                  </div>
+                </div>,
+                document.body
+              )}
           </>
         )}
       </div>
