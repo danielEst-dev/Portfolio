@@ -8,7 +8,7 @@ export const personalInfo = {
     "Magna Cum Laude BS Information Technology graduate and backend developer with professional experience building production-grade microservice architectures using ASP.NET Core (C#). Independently developed 130+ RESTful API endpoints across 7 microservice repositories within a live commercial product. Proficient in .NET Core, Node.js, Express.js, PostgreSQL, MariaDB, and Redis, with working knowledge of React and Next.js. Experienced in Agile/Scrum workflows, Git, and relational database schema design. Oracle Cloud 2025 Certified Developer Professional.",
   phone: "+63 962 827 1366",
   email: "daniel.anth.est.03@gmail.com",
-  location: "Meycauayan City, Bulacan",
+  location: "Philippines",
   linkedin: "https://linkedin.com/in/daniel-est",
   github: "https://github.com/danielEst-dev",
 };
