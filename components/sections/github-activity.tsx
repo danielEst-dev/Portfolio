@@ -643,14 +643,25 @@ export function GitHubActivity() {
                             </span>
                           </div>
                           <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                            {/* Driven by the parent <motion.ul>'s whileInView="show"
+                                rather than its own viewport observer. A standalone
+                                whileInView here is unreliable on mobile: nested inside
+                                a variant parent, its activation can lose to the
+                                inherited variant state and the fill never animates
+                                past width:0. Inheriting hidden/show from the ul (whose
+                                reveal demonstrably fires — the row labels are visible)
+                                guarantees the fill animates on every viewport. */}
                             <motion.div
                               className="h-full bg-accent rounded-full"
-                              initial={{ width: 0 }}
-                              whileInView={{ width: `${l.percent}%` }}
-                              viewport={{ once: true, margin: "-60px" }}
-                              transition={{
-                                duration: 0.7,
-                                ease: [0.25, 0.1, 0.25, 1],
+                              variants={{
+                                hidden: { width: 0 },
+                                show: {
+                                  width: `${l.percent}%`,
+                                  transition: {
+                                    duration: 0.7,
+                                    ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
+                                  },
+                                },
                               }}
                             />
                           </div>
