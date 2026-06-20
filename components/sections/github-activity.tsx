@@ -819,6 +819,7 @@ export function GitHubActivity() {
                                 strokeWidth="1.5"
                                 strokeLinecap="round"
                                 strokeDasharray={`${FLOW_DASH} ${FLOW_GAP}`}
+                                initial={{ strokeDashoffset: 0 }}
                                 animate={live ? { strokeDashoffset: [0, -FLOW_LEN] } : { strokeDashoffset: 0 }}
                                 transition={
                                   live ? { duration: 2.4, repeat: Infinity, ease: "linear" } : undefined
