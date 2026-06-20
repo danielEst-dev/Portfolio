@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   useCallback,
   useEffect,
@@ -222,12 +222,16 @@ type Momentum = { pct: number | null; dir: "up" | "down" | "flat" };
 type ActivityRhythm = {
   activeDays: number;
   totalDays: number;
+  totalContribs: number;
   longestGap: number;
   avgPerActiveDay: number | null;
   bestDay: { count: number; date: string } | null;
   busiestWeekday: string | null;
   busiestMonth: string | null;
   momentum: Momentum | null;
+  // Last 30 days of contribution counts, oldest→newest. Drives the trend
+  // sparkline. Fewer than 30 if the calendar is shorter; empty if no days.
+  recentSeries: number[];
 };
 
 // Format the momentum row as "↑ 23%" / "↓ 8%" / "flat" / "↑ new activity"
@@ -286,15 +290,19 @@ function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
   const topWeekday = weekdaySums.reduce((best, v, i) => (v > weekdaySums[best] ? i : best), 0);
   const topMonth = monthSums.reduce((best, v, i) => (v > monthSums[best] ? i : best), 0);
 
+  const recentSeries = days.slice(-30).map((d) => d.count);
+
   return {
     activeDays,
     totalDays: days.length,
+    totalContribs,
     longestGap,
     avgPerActiveDay: activeDays > 0 ? Math.round((totalContribs / activeDays) * 10) / 10 : null,
     bestDay: bestDay && bestDay.count > 0 ? bestDay : null,
     busiestWeekday: weekdaySums[topWeekday] > 0 ? WEEKDAY_NAMES[topWeekday] : null,
     busiestMonth: monthSums[topMonth] > 0 ? MONTH_NAMES[topMonth] : null,
     momentum,
+    recentSeries,
   };
 }
 
@@ -304,6 +312,30 @@ export function GitHubActivity() {
 
   // Derived from the calendar weeks already in the payload — no extra fetch.
   const rhythm = useMemo(() => (data ? computeActivityRhythm(data.weeks) : null), [data]);
+
+  // Live-motion gate for the activity-rhythm dashboard. The perpetual "data
+  // flow" animations only run while the panel is on screen (saves CPU/battery
+  // when scrolled away) and the user hasn't requested reduced motion. These
+  // hooks must stay at the top level — not inside the rhythm render block —
+  // because that block is conditional on `rhythm` being non-null.
+  const rhythmPanelRef = useRef<HTMLDivElement | null>(null);
+  const [rhythmInView, setRhythmInView] = useState(false);
+  const reducedMotion = useReducedMotion();
+  // The panel only mounts after the fetch resolves (status === "ready"), so the
+  // ref is null on first render. framer-motion's useInView() runs its effect once
+  // on mount and bails on a null ref — it would never re-attach once the panel
+  // appears, leaving this gate stuck closed and the flow animations static.
+  // A manual observer keyed on `data` re-runs exactly when the panel mounts.
+  useEffect(() => {
+    const el = rhythmPanelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setRhythmInView(entry.isIntersecting),
+      { rootMargin: "-80px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [data]);
 
   // ---- Contribution-cell tooltip (instant, themed) -------------------------
   // Imperative tooltip updated on hover so sweeping across ~365 cells never
@@ -661,67 +693,144 @@ export function GitHubActivity() {
                   </MotionWrapper>
                 )}
 
-                  {rhythm && (
+                  {rhythm && (() => {
+                    // `live` gates every perpetual animation below: on-screen AND
+                    // no reduced-motion preference. When false, each animated
+                    // element resolves to a static target (no repeat) so motion
+                    // stops cleanly instead of freezing mid-flight.
+                    const live = rhythmInView && !reducedMotion;
+
+                    // 30-day trend sparkline. A 300×48 viewBox stretched
+                    // edge-to-edge; x = even spacing, y = count relative to the
+                    // series max, inverted so 0 sits at the bottom.
+                    const series = rhythm.recentSeries;
+                    const showSparkline = series.length >= 2;
+                    const W = 300;
+                    const H = 48;
+                    const maxS = Math.max(1, ...series);
+                    const coords = series.map((c, i) => {
+                      const x = series.length > 1 ? (i / (series.length - 1)) * W : 0;
+                      const y = H - (c / maxS) * (H - 6) - 3;
+                      return { x, y };
+                    });
+                    const linePoints = coords
+                      .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+                      .join(" ");
+                    const areaPath = showSparkline
+                      ? `M0,${H} ${coords
+                          .map((p) => `L${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+                          .join(" ")} L${W},${H} Z`
+                      : "";
+                    // One flow cycle = dash + gap, so the bright dash travels the
+                    // whole line before the loop repeats seamlessly.
+                    const FLOW_DASH = 6;
+                    const FLOW_GAP = 200;
+                    const FLOW_LEN = FLOW_DASH + FLOW_GAP;
+
+                    const kpis: { label: string; value: string; sub?: string }[] = [
+                      { label: "Active days", value: `${rhythm.activeDays}` },
+                      {
+                        label: "Best day",
+                        value: rhythm.bestDay ? `${rhythm.bestDay.count}` : "—",
+                        sub: rhythm.bestDay ? formatShortDate(rhythm.bestDay.date) : undefined,
+                      },
+                      { label: "Momentum", value: rhythm.momentum ? momentumLabel(rhythm.momentum) : "—" },
+                    ];
+
+                    return (
                     <MotionWrapper delay={0.28}>
-                      <div className="corner-bracket p-5 border border-border/60">
+                      <div ref={rhythmPanelRef} className="corner-bracket p-5 border border-border/60 h-full">
                         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
                           Activity rhythm
                         </p>
-                        <motion.ul
-                          className="space-y-3"
+
+                        {/* KPI tiles. */}
+                        <motion.div
+                          className="grid grid-cols-3 gap-px bg-border border border-border mb-5"
                           variants={listContainer}
                           initial="hidden"
                           whileInView="show"
                           viewport={{ once: true, margin: "-60px" }}
                         >
-                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Days active</span>
-                            <span className="text-xs font-mono text-foreground tabular-nums">
-                              {rhythm.activeDays} days
-                            </span>
-                          </motion.li>
-                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Longest gap</span>
-                            <span className="text-xs font-mono text-foreground tabular-nums">
-                              {rhythm.longestGap} days
-                            </span>
-                          </motion.li>
-                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Avg / active day</span>
-                            <span className="text-xs font-mono text-foreground tabular-nums">
-                              {rhythm.avgPerActiveDay ?? "—"}
-                            </span>
-                          </motion.li>
-                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Best day</span>
-                            <span className="text-xs font-mono text-foreground tabular-nums">
-                              {rhythm.bestDay
-                                ? `${rhythm.bestDay.count} · ${formatShortDate(rhythm.bestDay.date)}`
-                                : "—"}
-                            </span>
-                          </motion.li>
-                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Busiest weekday</span>
-                            <span className="text-xs font-mono text-foreground">
-                              {rhythm.busiestWeekday ?? "—"}
-                            </span>
-                          </motion.li>
-                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Busiest month</span>
-                            <span className="text-xs font-mono text-foreground">
-                              {rhythm.busiestMonth ?? "—"}
-                            </span>
-                          </motion.li>
-                          <motion.li variants={listItem} className="flex items-baseline justify-between gap-3">
-                            <span className="text-xs text-muted-foreground">Recent momentum</span>
-                            <span className="text-xs font-mono text-foreground tabular-nums">
-                              {rhythm.momentum ? momentumLabel(rhythm.momentum) : "—"}
-                            </span>
-                          </motion.li>
-                        </motion.ul>
+                          {kpis.map((k) => (
+                            <motion.div
+                              key={k.label}
+                              variants={listItem}
+                              className="bg-background p-3"
+                            >
+                              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground mb-1.5">
+                                {k.label}
+                              </p>
+                              <p className="text-xl font-medium text-foreground tabular-nums leading-none">
+                                {k.value}
+                              </p>
+                              {k.sub && (
+                                <p className="text-[10px] font-mono text-muted-foreground mt-1">{k.sub}</p>
+                              )}
+                            </motion.div>
+                          ))}
+                        </motion.div>
+
+                        {/* 30-day trend sparkline. A dim base line plus a bright
+                            dash that travels along it (marching-ants "data
+                            streaming" effect), over a soft area fill. */}
+                        {showSparkline && (
+                          <motion.div
+                            variants={listItem}
+                            initial="hidden"
+                            whileInView="show"
+                            viewport={{ once: true, margin: "-60px" }}
+                            className="mb-4"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                                30-day trend
+                              </p>
+                              <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
+                                {series.reduce((s, c) => s + c, 0)} contribs
+                              </span>
+                            </div>
+                            <svg
+                              viewBox={`0 0 ${W} ${H}`}
+                              preserveAspectRatio="none"
+                              className="w-full h-12 text-accent"
+                              aria-hidden="true"
+                            >
+                              <defs>
+                                <linearGradient id="rhythmArea" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.18" />
+                                  <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+                                </linearGradient>
+                              </defs>
+                              <path d={areaPath} fill="url(#rhythmArea)" />
+                              <polyline
+                                points={linePoints}
+                                fill="none"
+                                stroke="currentColor"
+                                strokeOpacity="0.35"
+                                strokeWidth="1.5"
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                              />
+                              <motion.polyline
+                                points={linePoints}
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeDasharray={`${FLOW_DASH} ${FLOW_GAP}`}
+                                animate={live ? { strokeDashoffset: [0, -FLOW_LEN] } : { strokeDashoffset: 0 }}
+                                transition={
+                                  live ? { duration: 2.4, repeat: Infinity, ease: "linear" } : undefined
+                                }
+                              />
+                            </svg>
+                          </motion.div>
+                        )}
                       </div>
                     </MotionWrapper>
-                  )}
+                    );
+                  })()}
             </div>
 
               {data.pinnedRepos.length > 0 && (
