@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 
-// Per-segment error boundary. The root <header> from app/layout.tsx is
-// already mounted above this boundary, so the navbar stays put — only
-// the page content is replaced. `unstable_retry` is the Next 16.2+
+// Per-segment error boundary. The navbar lives on each page (app/page.tsx,
+// app/not-found.tsx) — it is NOT in app/layout.tsx, which only mounts
+// Spotlight/Toaster/CommandPalette around {children}. So a segment error
+// would otherwise leave users with no navigation. Render our own <Navbar />
+// here, consistent with not-found.tsx. `unstable_retry` is the Next 16.2+
 // recommended recovery function (see node_modules/next/dist/docs/01-app/
 // 03-api-reference/03-file-conventions/error.md).
 
@@ -25,6 +28,7 @@ export default function Error({
 
   return (
     <>
+      <Navbar />
       <main className="flex-1 flex items-center justify-center">
         <div className="mx-auto max-w-2xl px-6 py-24 text-center">
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
