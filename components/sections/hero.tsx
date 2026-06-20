@@ -159,7 +159,7 @@ export function Hero() {
       <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">01</SectionNumber>
       {/* min-h pushes the contact row to the bottom of the viewport for the
           cover-style asymmetry; content taller than the min-height just flows. */}
-      <div className="mx-auto max-w-6xl px-6 lg:px-8 pt-8 md:pt-12 lg:pt-12 pb-14 md:pb-20 lg:pb-20 relative z-10 flex flex-col min-h-[calc(100vh-4rem)]">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8 pt-8 md:pt-12 lg:pt-12 pb-14 md:pb-20 lg:pb-20 relative z-10 flex flex-col sm:min-h-[calc(100vh-4rem)]">
         {/* Top row: accent rule (left) + name / rotating role / live time (right) */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -226,7 +226,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="mt-auto pt-8 lg:pt-10"
+          className="sm:mt-auto pt-8 lg:pt-10"
         >
           <div className="border-t border-border/60 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2">
