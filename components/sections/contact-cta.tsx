@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { SectionLabel } from "@/components/section-label";
 import { MotionWrapper } from "@/components/motion-wrapper";
