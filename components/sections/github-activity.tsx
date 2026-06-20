@@ -20,7 +20,7 @@ import { MotionWrapper } from "@/components/motion-wrapper";
 import { CountUp } from "@/components/count-up";
 import { cn } from "@/lib/utils";
 import { personalInfo } from "@/lib/data";
-import { Github, Star, GitFork, ArrowUpRight } from "lucide-react";
+import { Github, Star, GitFork, ArrowUpRight, RefreshCw } from "lucide-react";
 import type { GitHubActivityPayload } from "@/lib/github";
 
 // Contribution level → background class. Opacities of the accent token map
@@ -142,7 +142,7 @@ function Skeleton() {
   );
 }
 
-function Fallback() {
+function Fallback({ onRetry }: { onRetry?: () => void }) {
   return (
     <div className="corner-bracket max-w-md border border-border/60 p-8">
       <Github className="h-6 w-6 text-accent mb-4" />
@@ -153,15 +153,27 @@ function Fallback() {
         Live contribution data couldn&apos;t be loaded. You can still browse my repositories
         directly.
       </p>
-      <Link
-        href={personalInfo.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-accent transition-colors link-underline"
-      >
-        Open GitHub profile
-        <ArrowUpRight className="h-4 w-4" />
-      </Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link
+          href={personalInfo.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-accent transition-colors link-underline"
+        >
+          Open GitHub profile
+          <ArrowUpRight className="h-4 w-4" />
+        </Link>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-accent transition-colors link-underline"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Try again
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -306,9 +318,18 @@ function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
   };
 }
 
-export function GitHubActivity() {
-  const [data, setData] = useState<ActivityData | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "fallback">("loading");
+export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPayload }) {
+  // When the server passes initialData (the 6h-cached GitHub payload), use it
+  // for the first paint and skip the mount-time fetch below — the panel renders
+  // immediately with no client round-trip. The /api/github refetch path still
+  // exists via the refresh button for on-demand updates.
+  const [data, setData] = useState<ActivityData | null>(
+    initialData && initialData.available ? initialData : null
+  );
+  const [status, setStatus] = useState<"loading" | "ready" | "fallback">(
+    initialData ? (initialData.available ? "ready" : "fallback") : "loading"
+  );
+  const [refreshing, setRefreshing] = useState(false);
 
   // Derived from the calendar weeks already in the payload — no extra fetch.
   const rhythm = useMemo(() => (data ? computeActivityRhythm(data.weeks) : null), [data]);
@@ -423,7 +444,30 @@ export function GitHubActivity() {
     return () => window.removeEventListener("resize", updateThumb);
   }, [updateThumb, data]);
 
+  // On-demand refresh: re-fetch /api/github and swap in the new payload on
+  // success. Leaves the current state intact on failure so a transient error
+  // never blanks out an already-rendered panel.
+  const refetch = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const r = await fetch("/api/github", { headers: { accept: "application/json" } });
+      const payload: GitHubActivityPayload | null = r.ok ? await r.json() : null;
+      if (payload && payload.available) {
+        setData(payload);
+        setStatus("ready");
+      }
+    } catch {
+      // keep current state
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
   useEffect(() => {
+    // The server already resolved the first paint via initialData; don't
+    // fetch on mount. When no initialData is supplied, fall back to the
+    // original client-side mount fetch.
+    if (initialData) return;
     const controller = new AbortController();
     fetch("/api/github", { headers: { accept: "application/json" }, signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
@@ -440,7 +484,7 @@ export function GitHubActivity() {
         if (!controller.signal.aborted) setStatus("fallback");
       });
     return () => controller.abort();
-  }, []);
+  }, [initialData]);
 
   return (
     <section id="github" className="pt-12 md:pt-16 pb-20 md:pb-28 relative overflow-hidden">
@@ -453,7 +497,7 @@ export function GitHubActivity() {
         {status === "loading" && <Skeleton />}
         {status === "fallback" && (
           <MotionWrapper delay={0.1}>
-            <Fallback />
+            <Fallback onRetry={refetch} />
           </MotionWrapper>
         )}
         {status === "ready" && data && (
@@ -890,7 +934,7 @@ export function GitHubActivity() {
                 </MotionWrapper>
               )}
 
-            <MotionWrapper delay={0.33} className="mt-10 text-center">
+            <MotionWrapper delay={0.33} className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href={personalInfo.github}
                 target="_blank"
@@ -900,6 +944,18 @@ export function GitHubActivity() {
                 <Github className="h-4 w-4" />
                 View full GitHub profile
               </Link>
+              <button
+                type="button"
+                onClick={refetch}
+                disabled={refreshing}
+                aria-label="Refresh GitHub activity"
+                className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-accent transition-colors link-underline disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <RefreshCw
+                  className={cn("h-4 w-4", refreshing && "animate-spin motion-reduce:animate-none")}
+                />
+                {refreshing ? "Refreshing" : "Refresh"}
+              </button>
             </MotionWrapper>
 
             {isClient &&
