@@ -33,19 +33,6 @@ const LEVEL_CLASS = [
   "bg-accent",
 ] as const;
 
-// Stacked composition-bar shades for the top-languages card. Strongest shade
-// goes to the most-used language so the bar reads as a ranked breakdown even
-// before the legend is scanned. Monochrome accent steps keep it on-brand with
-// the rest of the section.
-const LANG_BAR_CLASS = [
-  "bg-accent",
-  "bg-accent/80",
-  "bg-accent/60",
-  "bg-accent/45",
-  "bg-accent/30",
-  "bg-accent/20",
-] as const;
-
 type ActivityData = Extract<GitHubActivityPayload, { available: true }>;
 
 // Staggered reveal for inner lists. The "show" parent triggers children; the
@@ -204,9 +191,13 @@ function formatCellDate(iso: string): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(d);
 }
 
-// Position a fixed tooltip above (or, if too close to the top, below) a cell
-// rect, clamping horizontally so it can't spill off the viewport edges.
-function positionTooltip(tip: HTMLElement, rect: DOMRect): void {
+// Structural subset of DOMRect — accepts a real rect (cell/row) or a synthetic
+// cursor-point rect built from a mouse event.
+type TipRect = { top: number; bottom: number; left: number; right: number; width: number; height: number };
+
+// Position a fixed tooltip above (or, if too close to the top, below) a rect,
+// clamping horizontally so it can't spill off the viewport edges.
+function positionTooltip(tip: HTMLElement, rect: TipRect): void {
   const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
   const placeBelow = rect.top < 64;
   const left = Math.max(64, Math.min(rect.left + rect.width / 2, vw - 64));
@@ -325,33 +316,43 @@ export function GitHubActivity() {
     () => false
   );
   const tooltipRef = useRef<HTMLDivElement | null>(null);
-  const tooltipCountRef = useRef<HTMLDivElement | null>(null);
-  const tooltipDateRef = useRef<HTMLDivElement | null>(null);
+  const tooltipPrimaryRef = useRef<HTMLDivElement | null>(null);
+  const tooltipSecondaryRef = useRef<HTMLDivElement | null>(null);
 
   // ---- Custom mobile scroll (drag-to-scroll + themed thumb) ----------------
   const mobileScrollRef = useRef<HTMLDivElement | null>(null);
   const thumbRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef({ dragging: false, startX: 0, startScroll: 0 });
 
-  const showCell = (el: HTMLElement) => {
+  // Generic tooltip shower: writes the two lines and positions the fixed,
+  // portaled tooltip above (or below, near the top) the hovered rect. Shared
+  // by the contribution graph cells and the top-languages rows so both get the
+  // same instant, themed, re-render-free hover tooltip.
+  const showTip = (primary: string, secondary: string, rect: TipRect) => {
     const tip = tooltipRef.current;
-    if (!tip || !tooltipCountRef.current || !tooltipDateRef.current) return;
-    const count = Number(el.dataset.count ?? 0);
-    tooltipCountRef.current.textContent = `${count} ${count === 1 ? "contribution" : "contributions"}`;
-    tooltipDateRef.current.textContent = formatCellDate(el.dataset.date ?? "");
-    positionTooltip(tip, el.getBoundingClientRect());
+    if (!tip || !tooltipPrimaryRef.current || !tooltipSecondaryRef.current) return;
+    tooltipPrimaryRef.current.textContent = primary;
+    tooltipSecondaryRef.current.textContent = secondary;
+    positionTooltip(tip, rect);
     tip.style.opacity = "1";
   };
-  const hideCell = () => {
+  const hideTip = () => {
     if (tooltipRef.current) tooltipRef.current.style.opacity = "0";
   };
 
   const handleCellOver = (e: ReactMouseEvent) => {
     if (dragRef.current.dragging) return;
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-cell]");
-    if (el) showCell(el);
+    if (el) {
+      const count = Number(el.dataset.count ?? 0);
+      showTip(
+        `${count} ${count === 1 ? "contribution" : "contributions"}`,
+        formatCellDate(el.dataset.date ?? ""),
+        el.getBoundingClientRect()
+      );
+    }
   };
-  const handleCellLeave = () => hideCell();
+  const handleTipLeave = () => hideTip();
 
   const updateThumb = useCallback(() => {
     const el = mobileScrollRef.current;
@@ -370,7 +371,7 @@ export function GitHubActivity() {
     const el = e.currentTarget as HTMLElement;
     dragRef.current = { dragging: true, startX: e.clientX, startScroll: el.scrollLeft };
     el.setPointerCapture(e.pointerId);
-    hideCell();
+    hideTip();
   };
   const handlePointerMove = (e: ReactPointerEvent) => {
     if (!dragRef.current.dragging) return;
@@ -534,7 +535,7 @@ export function GitHubActivity() {
                     <div
                       className="flex gap-[3px] w-max"
                       onMouseOver={handleCellOver}
-                      onMouseLeave={handleCellLeave}
+                      onMouseLeave={handleTipLeave}
                     >
                       {data.weeks.map((week, wi) => (
                         <div
@@ -571,7 +572,7 @@ export function GitHubActivity() {
                   className="hidden md:grid gap-[3px]"
                   style={{ gridTemplateColumns: "repeat(53, minmax(0, 1fr))" }}
                   onMouseOver={handleCellOver}
-                  onMouseLeave={handleCellLeave}
+                  onMouseLeave={handleTipLeave}
                 >
                   {data.weeks.flatMap((week, wi) =>
                     week.days.map((d, di) => (
@@ -610,23 +611,6 @@ export function GitHubActivity() {
                     <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
                       Top languages
                     </p>
-                    {/* Stacked composition bar — a single segmented bar that
-                        summarizes the proportional split at a glance; the
-                        per-language list below acts as its legend/detail. Any
-                        gap on the right is "other" languages outside the top 6. */}
-                    <div className="flex h-2 rounded-full overflow-hidden bg-secondary mb-5">
-                      {data.topLanguages.map((l, i) => (
-                        <motion.div
-                          key={l.name}
-                          className={cn("h-full shrink-0", LANG_BAR_CLASS[i % LANG_BAR_CLASS.length])}
-                          initial={{ width: "0%" }}
-                          whileInView={{ width: `${l.percent}%` }}
-                          viewport={{ once: true, margin: "-60px" }}
-                          transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-                          title={`${l.name} · ${Math.round(l.percent)}%`}
-                        />
-                      ))}
-                    </div>
                     <motion.ul
                       className="space-y-3"
                       variants={listContainer}
@@ -817,10 +801,10 @@ export function GitHubActivity() {
                 >
                   <div className="bg-background border border-border shadow-sm rounded px-2 py-1 text-center whitespace-nowrap">
                     <div
-                      ref={tooltipCountRef}
+                      ref={tooltipPrimaryRef}
                       className="text-[11px] font-mono text-foreground tabular-nums"
                     />
-                    <div ref={tooltipDateRef} className="text-[10px] text-muted-foreground" />
+                    <div ref={tooltipSecondaryRef} className="text-[10px] text-muted-foreground" />
                   </div>
                 </div>,
                 document.body
