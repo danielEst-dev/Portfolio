@@ -18,7 +18,7 @@ export function Experience() {
     <section id="experience" className="py-20 md:py-28 relative overflow-hidden">
       <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">04</SectionNumber>
 
-      <div className="mx-auto max-w-4xl px-6 lg:px-8 relative z-10">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Experience" number="04" />
         </MotionWrapper>
@@ -75,9 +75,9 @@ export function Experience() {
 
                       {/* Role · date · company · stack — role leads, company demoted */}
                       <div>
-                        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5">
+                        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
                           <h3
-                            className={`text-lg md:text-xl font-medium tracking-tight leading-snug
+                            className={`text-xl md:text-2xl font-medium tracking-tight leading-snug
                                         transition-colors duration-200
                                         ${isOpen
                                           ? "text-accent"
@@ -85,18 +85,37 @@ export function Experience() {
                           >
                             {exp.role}
                           </h3>
-                          <span className="font-mono text-[10px] tracking-[0.04em] text-muted-foreground/50 md:ml-auto whitespace-nowrap">
+                          <span className="hidden md:block font-mono text-xs tracking-[0.04em] text-muted-foreground/50 md:ml-auto whitespace-nowrap">
                             {exp.date}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground/70 mt-1 leading-snug">
+                        <p className="text-base text-muted-foreground/70 mt-1 leading-snug">
                           <span className="text-muted-foreground/45">at</span>{" "}
                           {exp.company}
                         </p>
+                        {/* Date — below the company line on mobile. On desktop the
+                            date sits top-right on the role row above (hidden
+                            md:block), so this copy is mobile-only (display:none
+                            removes it from the a11y tree at md and up). */}
+                        <span className="block md:hidden mt-1 font-mono text-xs tracking-[0.04em] text-muted-foreground/50 whitespace-nowrap">
+                          {exp.date}
+                        </span>
                         {exp.stack && exp.stack.length > 0 && (
-                          <p className="mt-2 font-mono text-[10px] tracking-[0.04em] text-muted-foreground/55">
-                            {exp.stack.join(" / ")}
-                          </p>
+                          /* Outlined hairline chips — sans + uppercase tracking to
+                             match the SectionLabel voice, sized to sit below the
+                             "at company" line in the hierarchy (role 18 > 14 > 11).
+                             A span (not div) keeps this phrasing-content-valid inside
+                             the button. */
+                          <span className="mt-2.5 flex flex-wrap gap-1.5">
+                            {exp.stack.map((tech) => (
+                              <span
+                                key={tech}
+                                className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground/75 border border-border px-2 py-1"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </span>
                         )}
                       </div>
                     </button>
@@ -117,8 +136,11 @@ export function Experience() {
                         >
                           {/* Indent aligns with the content column */}
                           <div className="pb-6 pl-[calc(28px+1rem)] md:pl-[calc(28px+1.25rem)]">
-                            {/* Accent left-border — editorial pull-quote feel */}
-                            <div className="border-l border-accent/50 pl-4 md:pl-5">
+                            {/* Accent left-border — editorial pull-quote feel.
+                                Capped at max-w-3xl so bullet lines stay readable
+                                now that the section spans the full max-w-6xl
+                                column used by every other section. */}
+                            <div className="border-l border-accent/50 pl-4 md:pl-5 max-w-3xl">
                               <motion.ul
                                 className="space-y-3"
                                 initial={prefersReducedMotion ? false : "hidden"}
