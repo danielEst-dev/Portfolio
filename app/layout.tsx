@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { CommandPalette } from "@/components/command-palette";
-import { Spotlight } from "@/components/spotlight";
+import { ClientGlobals } from "@/components/client-globals";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -70,10 +69,9 @@ export default function RootLayout({
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
-          <Spotlight />
+          <ClientGlobals />
           {children}
           <Toaster position="bottom-right" richColors />
-          <CommandPalette />
         </ThemeProvider>
       </body>
     </html>

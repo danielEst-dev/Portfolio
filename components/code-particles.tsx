@@ -21,9 +21,11 @@ interface Particle {
   token: string;
   alpha: number;
   size: number;
+  fontStr: string;
 }
 
 function createParticle(w: number, h: number): Particle {
+  const size = Math.random() * 2 + 9; // 9–11px
   return {
     x: Math.random() * w,
     y: Math.random() * h,
@@ -32,7 +34,11 @@ function createParticle(w: number, h: number): Particle {
     vy: (Math.random() - 0.5) * 0.08 + 0.04, // slight downward bias
     token: TOKENS[Math.floor(Math.random() * TOKENS.length)],
     alpha: Math.random() * 0.035 + 0.015, // 0.015 – 0.05
-    size: Math.random() * 2 + 9, // 9–11px
+    size,
+    // Precomputed once so the rAF draw loop avoids a per-frame font-string
+    // allocation. ctx.font still varies per particle (size differs), so the
+    // assignment stays in the loop — only the string build is hoisted to init.
+    fontStr: `${size}px "JetBrains Mono", "Fira Mono", monospace`,
   };
 }
 
@@ -87,7 +93,7 @@ export function CodeParticles() {
         ctx.fontKerning = "none";
 
         for (const p of particles) {
-          ctx.font = `${p.size}px "JetBrains Mono", "Fira Mono", monospace`;
+          ctx.font = p.fontStr;
           ctx.fillStyle = `rgba(${baseColor},${p.alpha})`;
           ctx.fillText(p.token, p.x, p.y);
 

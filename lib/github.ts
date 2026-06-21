@@ -129,16 +129,16 @@ const ViewerSchema = z.object({
   followers: z.object({ totalCount: z.number().int().min(0) }),
 });
 
-export const GitHubResponseSchema = z.object({ data: z.object({ viewer: ViewerSchema }) });
+const GitHubResponseSchema = z.object({ data: z.object({ viewer: ViewerSchema }) });
 
 type Viewer = z.infer<typeof ViewerSchema>;
 
 // ---- public payload type (shared with the client via type-only import) ---
 
-export type ContributionCell = { date: string; level: 0 | 1 | 2 | 3 | 4; count: number };
-export type GitHubActivityWeek = { days: ContributionCell[] };
-export type TopLanguage = { name: string; count: number; percent: number };
-export type PinnedRepo = {
+type ContributionCell = { date: string; level: 0 | 1 | 2 | 3 | 4; count: number };
+type GitHubActivityWeek = { days: ContributionCell[] };
+type TopLanguage = { name: string; count: number; percent: number };
+type PinnedRepo = {
   name: string;
   url: string;
   description: string | null;
@@ -147,7 +147,7 @@ export type PinnedRepo = {
   primaryLanguage: string | null;
   updatedAt: string;
 };
-export type GitHubIdentity = {
+type GitHubIdentity = {
   login: string;
   name: string | null;
   bio: string | null;
@@ -157,7 +157,7 @@ export type GitHubIdentity = {
   status: { emoji: string; message: string; limited: boolean } | null;
 };
 
-export type GitHubActivityAvailable = {
+type GitHubActivityAvailable = {
   available: true;
   identity: GitHubIdentity;
   totalContributions: number;

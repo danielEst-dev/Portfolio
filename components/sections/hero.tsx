@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { personalInfo } from "@/lib/data";
 import { ArrowRight, Copy, Check } from "lucide-react";
@@ -99,10 +99,14 @@ function RotatingRole() {
   );
 }
 
-// Live local time (Asia/Manila, GMT+8, no DST). Rendered empty until mount to
-// avoid an SSR/client hydration mismatch, then ticks each second.
+// Live local time (Asia/Manila, GMT+8, no DST). Renders an empty span on the
+// server and first client paint — no clock value in JSX, so there is nothing
+// for a server/client clock skew to mismatch against (hydration-safe). After
+// mount, an interval updates that span's textContent imperatively each
+// second. No per-second React re-render: the interval mutates the DOM node
+// directly via a ref, so the hero subtree never re-renders for the clock.
 function LocalTime() {
-  const [time, setTime] = useState<string | null>(null);
+  const timeRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const fmt = new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Manila",
@@ -111,7 +115,11 @@ function LocalTime() {
       second: "2-digit",
       hour12: true,
     });
-    const tick = () => setTime(fmt.format(new Date()));
+    const tick = () => {
+      if (timeRef.current) {
+        timeRef.current.textContent = ` · ${fmt.format(new Date())}`;
+      }
+    };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
@@ -119,12 +127,7 @@ function LocalTime() {
   return (
     <>
       {personalInfo.location}
-      {time ? (
-        <>
-          {" · "}
-          <span className="whitespace-nowrap tabular-nums">{time}</span>
-        </>
-      ) : null}
+      <span ref={timeRef} className="whitespace-nowrap tabular-nums" />
     </>
   );
 }

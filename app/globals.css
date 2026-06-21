@@ -164,10 +164,6 @@ body::before {
   transform-origin: left;
 }
 
-.link-underline-active::after {
-  transform: scaleX(1);
-}
-
 /* Accent corner brackets */
 .corner-bracket {
   position: relative;
@@ -264,16 +260,6 @@ body::before {
 @keyframes arrow-nudge {
   0%,  100% { transform: translateX(0); }
   50%       { transform: translateX(3px); }
-}
-
-/* Pull quote / side note */
-.side-note {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--muted-foreground);
-  border-left: 1px solid var(--accent);
-  padding-left: 1rem;
 }
 
 /* Skills conveyor belt */
