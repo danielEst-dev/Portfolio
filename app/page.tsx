@@ -31,6 +31,7 @@ export default async function Home() {
         <Hero />
         <About />
         <FeaturedProjects />
+        {/* Below-fold section anchors live on the lazy wrappers so hash links work before the chunks mount. */}
         <LazyExperience />
         <Education />
         <LazySkills />

@@ -83,10 +83,18 @@ function SectionSkeleton() {
  * the wrapper div itself, so the space stays reserved even during the brief
  * moment between reveal and chunk load.
  */
-function LazyBoundary({ minHeight, children }: { minHeight: number; children: ReactNode }) {
+function LazyBoundary({
+  id,
+  minHeight,
+  children,
+}: {
+  id?: string;
+  minHeight: number;
+  children: ReactNode;
+}) {
   const { ref, near } = useNearViewport();
   return (
-    <div ref={ref} style={{ minHeight }}>
+    <div ref={ref} id={id} style={{ minHeight }}>
       {near ? children : <SectionSkeleton />}
     </div>
   );
@@ -94,7 +102,7 @@ function LazyBoundary({ minHeight, children }: { minHeight: number; children: Re
 
 export function LazyGitHubActivity({ initialData }: { initialData: GitHubActivityPayload }) {
   return (
-    <LazyBoundary minHeight={900}>
+    <LazyBoundary id="github" minHeight={900}>
       <GitHubActivityDynamic initialData={initialData} />
     </LazyBoundary>
   );
@@ -102,7 +110,7 @@ export function LazyGitHubActivity({ initialData }: { initialData: GitHubActivit
 
 export function LazyExperience() {
   return (
-    <LazyBoundary minHeight={560}>
+    <LazyBoundary id="experience" minHeight={560}>
       <ExperienceDynamic />
     </LazyBoundary>
   );
@@ -110,7 +118,7 @@ export function LazyExperience() {
 
 export function LazySkills() {
   return (
-    <LazyBoundary minHeight={560}>
+    <LazyBoundary id="skills" minHeight={560}>
       <SkillsDynamic />
     </LazyBoundary>
   );
@@ -118,7 +126,7 @@ export function LazySkills() {
 
 export function LazyCertifications() {
   return (
-    <LazyBoundary minHeight={480}>
+    <LazyBoundary id="certifications" minHeight={480}>
       <CertificationsDynamic />
     </LazyBoundary>
   );

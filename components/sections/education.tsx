@@ -9,7 +9,7 @@ import { ArrowRight } from "lucide-react";
 // stays scannable. The full list lives on /resume.
 const homeAwards = [
   "Top 8 Overall Graduate",
-  "Consistent President's List",
+  "President's List",
   "Highest-Ranking Male Graduate",
 ];
 
