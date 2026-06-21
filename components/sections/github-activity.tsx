@@ -913,7 +913,6 @@ export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPa
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-mono text-muted-foreground">
                             {r.primaryLanguage && (
                               <span className="flex items-center gap-1">
-                                <span className="size-2 rounded-full bg-accent" />
                                 {r.primaryLanguage}
                               </span>
                             )}
