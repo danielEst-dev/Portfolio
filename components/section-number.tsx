@@ -13,7 +13,7 @@ export function SectionNumber({ children, className = "" }: SectionNumberProps) 
       className={`section-number ${className}`}
       initial={{ opacity: 0.01 }}
       whileInView={{ opacity: 0.05 }}
-      viewport={{ once: false, margin: "-10% 0px -10% 0px" }}
+      viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
       transition={{ duration: 1.2, ease: "easeOut" }}
     >
       {children}
