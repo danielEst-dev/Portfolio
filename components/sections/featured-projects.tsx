@@ -9,24 +9,11 @@ import { SectionNumber } from "@/components/section-number";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import { useCanHover } from "@/lib/hooks";
+import { listContainer, listItem } from "@/lib/motion";
 
 // Module-scope: `projects` is a stable static import, so the slice can be
 // computed once instead of on every render.
 const featured = projects.slice(0, 2);
-
-const listContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.04 } },
-};
-
-const listItem = {
-  hidden: { opacity: 0, y: 16 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
-  },
-};
 
 function FeaturedCard({
   project,

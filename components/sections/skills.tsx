@@ -7,16 +7,12 @@ import { SectionNumber } from "@/components/section-number";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
+import { EASE, makeListContainer } from "@/lib/motion";
 
 // Entrance animations only — no hover required, so they play on every device.
 // Reduced-motion users get `initial={false}`, which renders the final state
 // with no movement (variant propagation handles the rest).
-const ease = [0.25, 0.1, 0.25, 1] as [number, number, number, number];
-
-const listContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
-};
+const listContainer = makeListContainer(0.08, 0.15);
 
 const rowContainer = {
   hidden: {},
@@ -25,12 +21,12 @@ const rowContainer = {
 
 const rowItem = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
 };
 
 const skillItem = {
   hidden: { opacity: 0, y: 8 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE } },
 };
 
 function SkillRow({
