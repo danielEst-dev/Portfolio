@@ -9,20 +9,7 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import { SectionNumber } from "@/components/section-number";
 import { useRef } from "react";
 import { useCanHover } from "@/lib/hooks";
-
-const listContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.04 } },
-};
-
-const listItem = {
-  hidden: { opacity: 0, y: 16 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
-  },
-};
+import { listContainer, listItem } from "@/lib/motion";
 
 function CertCard({
   cert,
