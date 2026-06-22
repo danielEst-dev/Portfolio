@@ -72,6 +72,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
+
+    // Honeypot: if the hidden "website" field is non-empty, a bot filled it.
+    // Respond as if the submission succeeded so the bot learns nothing, but
+    // do no further work (no rate-limit hit, no email). Checked before the
+    // normal schema validation so an invalid honeypot payload can't surface a
+    // 400 that would reveal the trap.
+    if (typeof body?.website === "string" && body.website.trim() !== "") {
+      return NextResponse.json({ success: true, message: "Message sent successfully." });
+    }
+
     const parsed = contactSchema.safeParse(body);
 
     if (!parsed.success) {

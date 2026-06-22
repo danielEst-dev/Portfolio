@@ -16,6 +16,10 @@ const contactFormSchema = z.object({
   email: z.string().email("Invalid email address").max(100),
   subject: z.string().min(2, "Subject is required").max(150),
   message: z.string().min(10, "Message must be at least 10 characters").max(2000),
+  // Honeypot: legitimate users never see/fill this. Bots that auto-fill
+  // every field will populate it, which the API rejects silently. Optional
+  // so real users (who leave it blank) pass validation.
+  website: z.string().max(1000).optional(),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -146,6 +150,21 @@ export function ContactForm() {
             {errors.message.message}
           </p>
         )}
+      </div>
+      {/* Honeypot: visually hidden + removed from a11y tree and tab order so
+          real users (including AT users) never interact with it. Bots that
+          blindly fill inputs will trip it; the API silently rejects those. */}
+      <div className="sr-only" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="sr-only"
+          {...register("website")}
+        />
       </div>
       <div className="text-center pt-2">
         <Button
