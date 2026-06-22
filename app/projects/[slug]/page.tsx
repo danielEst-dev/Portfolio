@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   return {
     title,
     description: project.shortDescription,
+    alternates: { canonical: `/projects/${project.slug}` },
     openGraph: {
       title,
       description: project.shortDescription,
@@ -53,8 +54,38 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const prevProject = projects[projectIndex - 1] || null;
   const nextProject = projects[projectIndex + 1] || null;
 
+  // BreadcrumbList: Home → Projects → Current project
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://daniel-est.vercel.app",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Projects",
+        item: "https://daniel-est.vercel.app/projects",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: project.name,
+        item: `https://daniel-est.vercel.app/projects/${project.slug}`,
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <Navbar />
       <main className="flex-1">
         <article className="py-16 md:py-24">

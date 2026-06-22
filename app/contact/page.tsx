@@ -14,6 +14,7 @@ const ogImage = `/api/og?title=${encodeURIComponent(title)}&description=${encode
 export const metadata: Metadata = {
   title,
   description,
+  alternates: { canonical: "/contact" },
   openGraph: {
     title,
     description,

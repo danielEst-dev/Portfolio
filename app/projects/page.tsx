@@ -14,6 +14,7 @@ const ogImage = `/api/og?title=${encodeURIComponent(title)}&description=${encode
 export const metadata: Metadata = {
   title,
   description,
+  alternates: { canonical: "/projects" },
   openGraph: {
     title,
     description,
@@ -29,9 +30,33 @@ export const metadata: Metadata = {
   },
 };
 
+// BreadcrumbList: Home → Projects
+const projectsBreadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://daniel-est.vercel.app",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Projects",
+      item: "https://daniel-est.vercel.app/projects",
+    },
+  ],
+};
+
 export default function ProjectsPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectsBreadcrumbSchema) }}
+      />
       <Navbar />
       <main className="flex-1">
         <section className="py-20 md:py-28">
