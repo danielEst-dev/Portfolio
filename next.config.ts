@@ -29,6 +29,21 @@ const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
   },
+  images: {
+    // Allow next/image to optimize the GitHub avatar served from
+    // avatars.githubusercontent.com. Shape per the Next.js 16 image guide
+    // (node_modules/next/dist/docs/01-app/01-getting-started/12-images.md).
+    // The CSP img-src already permits this host.
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        port: "",
+        pathname: "/**",
+        search: "",
+      },
+    ],
+  },
   headers: async () => {
     // Hashed static assets get a long, immutable cache in production so
     // repeat visits skip the network. In dev we MUST NOT set this — Next.js

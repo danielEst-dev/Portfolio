@@ -1,18 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type MouseEvent as ReactMouseEvent,
-  type PointerEvent as ReactPointerEvent,
-  type ReactNode,
-} from "react";
-import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { SectionLabel } from "@/components/section-label";
 import { SectionNumber } from "@/components/section-number";
@@ -20,35 +9,14 @@ import { MotionWrapper } from "@/components/motion-wrapper";
 import { CountUp } from "@/components/count-up";
 import { cn } from "@/lib/utils";
 import { personalInfo } from "@/lib/data";
-import { Github, Star, GitFork, ArrowUpRight, RefreshCw } from "lucide-react";
+import { Github, ArrowUpRight, RefreshCw } from "lucide-react";
 import type { GitHubActivityPayload } from "@/lib/github";
-
-// Contribution level → background class. Opacities of the accent token map
-// GitHub's quartile buckets; level 0 is the muted "no activity" cell.
-const LEVEL_CLASS = [
-  "bg-secondary",
-  "bg-accent/20",
-  "bg-accent/40",
-  "bg-accent/70",
-  "bg-accent",
-] as const;
-
-type ActivityData = Extract<GitHubActivityPayload, { available: true }>;
-
-// Staggered reveal for inner lists. The "show" parent triggers children; the
-// "item" child fades up with the same easing used elsewhere in the codebase.
-const listContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.04 } },
-};
-const listItem = {
-  hidden: { opacity: 0, y: 12 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
-  },
-};
+import type { ActivityData } from "./github-activity/shared";
+import { listContainer, listItem } from "./github-activity/shared";
+import { IdentityStrip } from "./github-activity/IdentityStrip";
+import { ContributionGraph } from "./github-activity/ContributionGraph";
+import { ActivityRhythm } from "./github-activity/ActivityRhythm";
+import { PinnedRepos } from "./github-activity/PinnedRepos";
 
 function Stat({
   label,
@@ -178,146 +146,6 @@ function Fallback({ onRetry }: { onRetry?: () => void }) {
   );
 }
 
-// Absolute month-year (not relative "2 days ago") so it never drifts across
-// the 6h cache window. Runs only post-fetch, never during SSR.
-function formatMonthYear(iso: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" }).format(d);
-}
-
-// Short "Mon D" date for the best-day row of the activity card.
-function formatShortDate(iso: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(d);
-}
-
-// "Mon D, YYYY" for the contribution-cell tooltip.
-function formatCellDate(iso: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(d);
-}
-
-// Structural subset of DOMRect — accepts a real rect (cell/row) or a synthetic
-// cursor-point rect built from a mouse event.
-type TipRect = { top: number; bottom: number; left: number; right: number; width: number; height: number };
-
-// Position a fixed tooltip above (or, if too close to the top, below) a rect,
-// clamping horizontally so it can't spill off the viewport edges.
-function positionTooltip(tip: HTMLElement, rect: TipRect): void {
-  const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
-  const placeBelow = rect.top < 64;
-  const left = Math.max(64, Math.min(rect.left + rect.width / 2, vw - 64));
-  tip.style.left = `${left}px`;
-  tip.style.top = placeBelow ? `${rect.bottom + 8}px` : `${rect.top - 8}px`;
-  tip.style.transform = placeBelow ? "translateX(-50%)" : "translateX(-50%) translateY(-100%)";
-}
-
-// Derive an "activity rhythm" summary from the contribution calendar weeks,
-// which are already shipped to the client for the graph — so this adds no
-// payload and no extra API call. Runs only post-fetch, like the formatters above.
-const WEEKDAY_NAMES = [
-  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
-] as const;
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-] as const;
-
-type Momentum = { pct: number | null; dir: "up" | "down" | "flat" };
-
-type ActivityRhythm = {
-  activeDays: number;
-  totalDays: number;
-  totalContribs: number;
-  longestGap: number;
-  avgPerActiveDay: number | null;
-  bestDay: { count: number; date: string } | null;
-  busiestWeekday: string | null;
-  busiestMonth: string | null;
-  momentum: Momentum | null;
-  // Last 30 days of contribution counts, oldest→newest. Drives the trend
-  // sparkline. Fewer than 30 if the calendar is shorter; empty if no days.
-  recentSeries: number[];
-};
-
-// Format the momentum row as "↑ 23%" / "↓ 8%" / "flat" / "↑ new activity"
-// (the last when there was no activity in the prior window to compare to).
-function momentumLabel(m: Momentum): string {
-  if (m.pct === null) return m.dir === "up" ? "↑ new activity" : "flat";
-  if (m.pct === 0) return "flat";
-  return `${m.dir === "up" ? "↑" : "↓"} ${Math.abs(m.pct)}%`;
-}
-
-function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
-  const days = weeks.flatMap((w) => w.days);
-
-  const weekdaySums = new Array(7).fill(0);
-  const monthSums = new Array(12).fill(0);
-  let activeDays = 0;
-  let totalContribs = 0;
-  let bestDay: { count: number; date: string } | null = null;
-
-  for (const day of days) {
-    totalContribs += day.count;
-    if (day.count > 0) activeDays += 1;
-    if (!bestDay || day.count > bestDay.count) bestDay = { count: day.count, date: day.date };
-    const d = new Date(day.date);
-    if (!Number.isNaN(d.getTime())) {
-      weekdaySums[d.getUTCDay()] += day.count;
-      monthSums[d.getUTCMonth()] += day.count;
-    }
-  }
-
-  // Longest gap: longest run of zero-contribution days. Drop the final day if
-  // it's zero (today isn't over) so an in-progress day can't inflate the gap.
-  const gapDays =
-    days.length && days[days.length - 1].count === 0 ? days.slice(0, -1) : days;
-  let gapRun = 0;
-  let longestGap = 0;
-  for (const d of gapDays) {
-    if (d.count > 0) gapRun = 0;
-    else if ((gapRun += 1) > longestGap) longestGap = gapRun;
-  }
-
-  // Recent momentum: total of the last 30 days vs the 30 before that. Needs a
-  // 60-day window to be meaningful; otherwise leave it null.
-  let momentum: Momentum | null = null;
-  if (days.length >= 60) {
-    const last30 = days.slice(-30).reduce((s, d) => s + d.count, 0);
-    const prev30 = days.slice(-60, -30).reduce((s, d) => s + d.count, 0);
-    if (prev30 === 0) {
-      momentum = { pct: null, dir: last30 > 0 ? "up" : "flat" };
-    } else {
-      const pct = Math.round(((last30 - prev30) / prev30) * 100);
-      momentum = { pct, dir: pct > 0 ? "up" : pct < 0 ? "down" : "flat" };
-    }
-  }
-
-  const topWeekday = weekdaySums.reduce((best, v, i) => (v > weekdaySums[best] ? i : best), 0);
-  const topMonth = monthSums.reduce((best, v, i) => (v > monthSums[best] ? i : best), 0);
-
-  const recentSeries = days.slice(-30).map((d) => d.count);
-
-  return {
-    activeDays,
-    totalDays: days.length,
-    totalContribs,
-    longestGap,
-    avgPerActiveDay: activeDays > 0 ? Math.round((totalContribs / activeDays) * 10) / 10 : null,
-    bestDay: bestDay && bestDay.count > 0 ? bestDay : null,
-    busiestWeekday: weekdaySums[topWeekday] > 0 ? WEEKDAY_NAMES[topWeekday] : null,
-    busiestMonth: monthSums[topMonth] > 0 ? MONTH_NAMES[topMonth] : null,
-    momentum,
-    recentSeries,
-  };
-}
-
 export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPayload }) {
   // When the server passes initialData (the 6h-cached GitHub payload), use it
   // for the first paint and skip the mount-time fetch below — the panel renders
@@ -330,119 +158,6 @@ export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPa
     initialData ? (initialData.available ? "ready" : "fallback") : "loading"
   );
   const [refreshing, setRefreshing] = useState(false);
-
-  // Derived from the calendar weeks already in the payload — no extra fetch.
-  const rhythm = useMemo(() => (data ? computeActivityRhythm(data.weeks) : null), [data]);
-
-  // Live-motion gate for the activity-rhythm dashboard. The perpetual "data
-  // flow" animations only run while the panel is on screen (saves CPU/battery
-  // when scrolled away) and the user hasn't requested reduced motion. These
-  // hooks must stay at the top level — not inside the rhythm render block —
-  // because that block is conditional on `rhythm` being non-null.
-  const rhythmPanelRef = useRef<HTMLDivElement | null>(null);
-  const [rhythmInView, setRhythmInView] = useState(false);
-  const reducedMotion = useReducedMotion();
-  // The panel only mounts after the fetch resolves (status === "ready"), so the
-  // ref is null on first render. framer-motion's useInView() runs its effect once
-  // on mount and bails on a null ref — it would never re-attach once the panel
-  // appears, leaving this gate stuck closed and the flow animations static.
-  // A manual observer keyed on `data` re-runs exactly when the panel mounts.
-  useEffect(() => {
-    const el = rhythmPanelRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setRhythmInView(entry.isIntersecting),
-      { rootMargin: "-80px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [data]);
-
-  // ---- Contribution-cell tooltip (instant, themed) -------------------------
-  // Imperative tooltip updated on hover so sweeping across ~365 cells never
-  // triggers a React re-render. Portaled to <body> so it escapes the section's
-  // overflow-hidden and any transformed ancestors, and positions fixed to the
-  // viewport. `isClient` gates the portal to avoid an SSR/hydration mismatch.
-  const isClient = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
-  const tooltipPrimaryRef = useRef<HTMLDivElement | null>(null);
-  const tooltipSecondaryRef = useRef<HTMLDivElement | null>(null);
-
-  // ---- Custom mobile scroll (drag-to-scroll + themed thumb) ----------------
-  const mobileScrollRef = useRef<HTMLDivElement | null>(null);
-  const thumbRef = useRef<HTMLDivElement | null>(null);
-  const dragRef = useRef({ dragging: false, startX: 0, startScroll: 0 });
-
-  // Generic tooltip shower: writes the two lines and positions the fixed,
-  // portaled tooltip above (or below, near the top) the hovered rect. Shared
-  // by the contribution graph cells and the top-languages rows so both get the
-  // same instant, themed, re-render-free hover tooltip.
-  const showTip = (primary: string, secondary: string, rect: TipRect) => {
-    const tip = tooltipRef.current;
-    if (!tip || !tooltipPrimaryRef.current || !tooltipSecondaryRef.current) return;
-    tooltipPrimaryRef.current.textContent = primary;
-    tooltipSecondaryRef.current.textContent = secondary;
-    positionTooltip(tip, rect);
-    tip.style.opacity = "1";
-  };
-  const hideTip = () => {
-    if (tooltipRef.current) tooltipRef.current.style.opacity = "0";
-  };
-
-  const handleCellOver = (e: ReactMouseEvent) => {
-    if (dragRef.current.dragging) return;
-    const el = (e.target as HTMLElement).closest<HTMLElement>("[data-cell]");
-    if (el) {
-      const count = Number(el.dataset.count ?? 0);
-      showTip(
-        `${count} ${count === 1 ? "contribution" : "contributions"}`,
-        formatCellDate(el.dataset.date ?? ""),
-        el.getBoundingClientRect()
-      );
-    }
-  };
-  const handleTipLeave = () => hideTip();
-
-  const updateThumb = useCallback(() => {
-    const el = mobileScrollRef.current;
-    const thumb = thumbRef.current;
-    if (!el || !thumb) return;
-    const max = el.scrollWidth - el.clientWidth;
-    const width = el.scrollWidth > 0 ? (el.clientWidth / el.scrollWidth) * 100 : 100;
-    const left = max > 0 ? (el.scrollLeft / max) * (100 - width) : 0;
-    thumb.style.left = `${left}%`;
-    thumb.style.width = `${width}%`;
-  }, []);
-
-  // Mouse-only drag-to-scroll; touch keeps native horizontal panning.
-  const handlePointerDown = (e: ReactPointerEvent) => {
-    if (e.pointerType !== "mouse") return;
-    const el = e.currentTarget as HTMLElement;
-    dragRef.current = { dragging: true, startX: e.clientX, startScroll: el.scrollLeft };
-    el.setPointerCapture(e.pointerId);
-    hideTip();
-  };
-  const handlePointerMove = (e: ReactPointerEvent) => {
-    if (!dragRef.current.dragging) return;
-    const el = e.currentTarget as HTMLElement;
-    el.scrollLeft = dragRef.current.startScroll - (e.clientX - dragRef.current.startX);
-  };
-  const handlePointerUp = (e: ReactPointerEvent) => {
-    if (!dragRef.current.dragging) return;
-    const el = e.currentTarget as HTMLElement;
-    dragRef.current.dragging = false;
-    if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
-  };
-
-  useEffect(() => {
-    updateThumb();
-    window.addEventListener("resize", updateThumb);
-    return () => window.removeEventListener("resize", updateThumb);
-  }, [updateThumb, data]);
 
   // On-demand refresh: re-fetch /api/github and swap in the new payload on
   // success. Leaves the current state intact on failure so a transient error
@@ -502,58 +217,7 @@ export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPa
         )}
         {status === "ready" && data && (
           <>
-            <MotionWrapper delay={0.05} className="mb-8">
-              <div className="corner-bracket flex items-start gap-4 sm:gap-5 p-5 border border-border/60">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={data.identity.avatarUrl}
-                  alt={data.identity.name ?? data.identity.login}
-                  width={56}
-                  height={56}
-                  loading="lazy"
-                  decoding="async"
-                  className="rounded-full border border-border/60 shrink-0"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <h3 className="text-lg sm:text-xl font-medium text-foreground truncate">
-                      {data.identity.name ?? data.identity.login}
-                    </h3>
-                    <span className="font-mono text-xs text-muted-foreground">
-                      @{data.identity.login}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      · on GitHub since {data.identity.memberSince}
-                    </span>
-                    {data.identity.isHireable && (
-                      <span className="text-[10px] font-medium uppercase tracking-wider text-accent border border-accent/40 px-1.5 py-0.5">
-                        Open to work
-                      </span>
-                    )}
-                  </div>
-                  {data.identity.bio && (
-                    <p className="text-sm text-muted-foreground leading-relaxed mt-1.5 line-clamp-2">
-                      {data.identity.bio}
-                    </p>
-                  )}
-                  {data.identity.status && (
-                    <p className="text-xs text-muted-foreground mt-2 flex flex-wrap items-center gap-1.5">
-                      {data.identity.status.emoji && (
-                        <span className="text-base leading-none">
-                          {data.identity.status.emoji}
-                        </span>
-                      )}
-                      {data.identity.status.message && (
-                        <span>{data.identity.status.message}</span>
-                      )}
-                      {data.identity.status.limited && (
-                        <span className="opacity-60">· limited availability</span>
-                      )}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </MotionWrapper>
+            <IdentityStrip identity={data.identity} />
 
             <motion.div
               className="grid grid-cols-2 md:grid-cols-5 gap-px bg-border border border-border mb-10"
@@ -590,100 +254,15 @@ export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPa
               </motion.div>
             </motion.div>
 
-            <MotionWrapper delay={0.18} className="mb-10">
-              <div className="corner-bracket p-5 border border-border/60">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
-                  Contribution graph · last 12 months
-                </p>
-                {/* Mobile (<md): fixed-size cells in a custom drag-to-scroll
-                    track with a themed thumb indicator. Native scrollbar is
-                    hidden; touch still pans natively, mouse drags to scroll. */}
-                <div className="md:hidden">
-                  <div
-                    ref={mobileScrollRef}
-                    onPointerDown={handlePointerDown}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    onPointerLeave={handlePointerUp}
-                    onScroll={updateThumb}
-                    className="overflow-x-auto cursor-grab active:cursor-grabbing select-none [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [touch-action:pan-x]"
-                  >
-                    <div
-                      className="flex gap-[3px] w-max"
-                      onMouseOver={handleCellOver}
-                      onMouseLeave={handleTipLeave}
-                    >
-                      {data.weeks.map((week, wi) => (
-                        <div
-                          key={week.days[0]?.date ?? wi}
-                          className="grid grid-rows-7 gap-[3px]"
-                        >
-                          {week.days.map((d) => (
-                            <div
-                              key={d.date}
-                              data-cell
-                              data-date={d.date}
-                              data-count={d.count}
-                              className={cn(
-                                "size-[10px] rounded-[2px]",
-                                LEVEL_CLASS[d.level]
-                              )}
-                            />
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="mt-3 h-1 bg-secondary rounded-full relative" aria-hidden="true">
-                    <div
-                      ref={thumbRef}
-                      className="absolute top-0 h-full bg-accent rounded-full"
-                      style={{ left: "0%", width: "100%" }}
-                    />
-                  </div>
-                </div>
-                {/* md+: cells stretch edge-to-edge via a fixed 53-column grid.
-                    Each cell is `aspect-square w-full` so it fills its column. */}
-                <div
-                  className="hidden md:grid gap-[3px]"
-                  style={{ gridTemplateColumns: "repeat(53, minmax(0, 1fr))" }}
-                  onMouseOver={handleCellOver}
-                  onMouseLeave={handleTipLeave}
-                >
-                  {data.weeks.flatMap((week, wi) =>
-                    week.days.map((d, di) => (
-                      <motion.div
-                        key={d.date}
-                        data-cell
-                        data-date={d.date}
-                        data-count={d.count}
-                        className={cn(
-                          "aspect-square w-full rounded-[2px]",
-                          LEVEL_CLASS[d.level]
-                        )}
-                        // Per-cell stagger, capped so the cascade stays under ~1s.
-                        initial={{ opacity: 0, scale: 0.6 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true, margin: "-60px" }}
-                        transition={{
-                          duration: 0.25,
-                          delay: Math.min((wi * 7 + di) * 0.003, 0.9),
-                          ease: [0.25, 0.1, 0.25, 1],
-                        }}
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </MotionWrapper>
+            <ContributionGraph weeks={data.weeks} />
 
             {/* Top languages + Activity rhythm — a balanced 2-col row that
                 always fills the width regardless of whether pinned repos
                 exist. Drops to a single column when there are no languages. */}
             <div className={cn("grid gap-10", data.topLanguages.length > 0 && "md:grid-cols-2")}>
-                {data.topLanguages.length > 0 && (
-                  <MotionWrapper delay={0.23}>
-                    <div className="corner-bracket p-5 border border-border/60">
+              {data.topLanguages.length > 0 && (
+                <MotionWrapper delay={0.23}>
+                  <div className="corner-bracket p-5 border border-border/60">
                     <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
                       Top languages
                     </p>
@@ -733,205 +312,14 @@ export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPa
                       {data.topLanguages[0]?.name} leads at{" "}
                       {Math.round(data.topLanguages[0]?.percent ?? 0)}%
                     </p>
-                    </div>
-                  </MotionWrapper>
-                )}
-
-                  {rhythm && (() => {
-                    // `live` gates every perpetual animation below: on-screen AND
-                    // no reduced-motion preference. When false, each animated
-                    // element resolves to a static target (no repeat) so motion
-                    // stops cleanly instead of freezing mid-flight.
-                    const live = rhythmInView && !reducedMotion;
-
-                    // 30-day trend sparkline. A 300×48 viewBox stretched
-                    // edge-to-edge; x = even spacing, y = count relative to the
-                    // series max, inverted so 0 sits at the bottom.
-                    const series = rhythm.recentSeries;
-                    const showSparkline = series.length >= 2;
-                    const W = 300;
-                    const H = 48;
-                    const maxS = Math.max(1, ...series);
-                    const coords = series.map((c, i) => {
-                      const x = series.length > 1 ? (i / (series.length - 1)) * W : 0;
-                      const y = H - (c / maxS) * (H - 6) - 3;
-                      return { x, y };
-                    });
-                    const linePoints = coords
-                      .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-                      .join(" ");
-                    const areaPath = showSparkline
-                      ? `M0,${H} ${coords
-                          .map((p) => `L${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-                          .join(" ")} L${W},${H} Z`
-                      : "";
-                    // One flow cycle = dash + gap, so the bright dash travels the
-                    // whole line before the loop repeats seamlessly.
-                    const FLOW_DASH = 6;
-                    const FLOW_GAP = 200;
-                    const FLOW_LEN = FLOW_DASH + FLOW_GAP;
-
-                    const kpis: { label: string; value: string; sub?: string }[] = [
-                      { label: "Active days", value: `${rhythm.activeDays}` },
-                      {
-                        label: "Best day",
-                        value: rhythm.bestDay ? `${rhythm.bestDay.count}` : "—",
-                        sub: rhythm.bestDay ? formatShortDate(rhythm.bestDay.date) : undefined,
-                      },
-                      { label: "Momentum", value: rhythm.momentum ? momentumLabel(rhythm.momentum) : "—" },
-                    ];
-
-                    return (
-                    <MotionWrapper delay={0.28}>
-                      <div ref={rhythmPanelRef} className="corner-bracket p-5 border border-border/60 h-full">
-                        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
-                          Activity rhythm
-                        </p>
-
-                        {/* KPI tiles. */}
-                        <motion.div
-                          className="grid grid-cols-3 gap-px bg-border border border-border mb-5"
-                          variants={listContainer}
-                          initial="hidden"
-                          whileInView="show"
-                          viewport={{ once: true, margin: "-60px" }}
-                        >
-                          {kpis.map((k) => (
-                            <motion.div
-                              key={k.label}
-                              variants={listItem}
-                              className="bg-background p-3"
-                            >
-                              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground mb-1.5">
-                                {k.label}
-                              </p>
-                              <p className="text-xl font-medium text-foreground tabular-nums leading-none">
-                                {k.value}
-                              </p>
-                              {k.sub && (
-                                <p className="text-[10px] font-mono text-muted-foreground mt-1">{k.sub}</p>
-                              )}
-                            </motion.div>
-                          ))}
-                        </motion.div>
-
-                        {/* 30-day trend sparkline. A dim base line plus a bright
-                            dash that travels along it (marching-ants "data
-                            streaming" effect), over a soft area fill. */}
-                        {showSparkline && (
-                          <motion.div
-                            variants={listItem}
-                            initial="hidden"
-                            whileInView="show"
-                            viewport={{ once: true, margin: "-60px" }}
-                            className="mb-4"
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                                30-day trend
-                              </p>
-                              <span className="text-[10px] font-mono text-muted-foreground tabular-nums">
-                                {series.reduce((s, c) => s + c, 0)} contribs
-                              </span>
-                            </div>
-                            <svg
-                              viewBox={`0 0 ${W} ${H}`}
-                              preserveAspectRatio="none"
-                              className="w-full h-12 text-accent"
-                              aria-hidden="true"
-                            >
-                              <defs>
-                                <linearGradient id="rhythmArea" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.18" />
-                                  <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
-                                </linearGradient>
-                              </defs>
-                              <path d={areaPath} fill="url(#rhythmArea)" />
-                              <polyline
-                                points={linePoints}
-                                fill="none"
-                                stroke="currentColor"
-                                strokeOpacity="0.35"
-                                strokeWidth="1.5"
-                                strokeLinejoin="round"
-                                strokeLinecap="round"
-                              />
-                              <motion.polyline
-                                points={linePoints}
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeDasharray={`${FLOW_DASH} ${FLOW_GAP}`}
-                                initial={{ strokeDashoffset: 0 }}
-                                animate={live ? { strokeDashoffset: [0, -FLOW_LEN] } : { strokeDashoffset: 0 }}
-                                transition={
-                                  live ? { duration: 2.4, repeat: Infinity, ease: "linear" } : undefined
-                                }
-                              />
-                            </svg>
-                          </motion.div>
-                        )}
-                      </div>
-                    </MotionWrapper>
-                    );
-                  })()}
-            </div>
-
-              {data.pinnedRepos.length > 0 && (
-                <MotionWrapper delay={0.33} className="mt-10">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
-                    Pinned repositories
-                  </p>
-                  <motion.ul
-                    className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
-                    variants={listContainer}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, margin: "-60px" }}
-                  >
-                    {data.pinnedRepos.map((r) => (
-                      <motion.li key={r.name} variants={listItem}>
-                        <a
-                          href={r.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="corner-bracket group block h-full p-5 border border-border/60 hover:border-accent/60 transition-colors"
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors flex items-center gap-2">
-                              <Github className="h-3.5 w-3.5" />
-                              {r.name}
-                            </span>
-                            <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
-                          </div>
-                          {r.description && (
-                            <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">
-                              {r.description}
-                            </p>
-                          )}
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-mono text-muted-foreground">
-                            {r.primaryLanguage && (
-                              <span className="flex items-center gap-1">
-                                {r.primaryLanguage}
-                              </span>
-                            )}
-                            <span className="flex items-center gap-1">
-                              <Star className="h-3 w-3" />
-                              {r.stars}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <GitFork className="h-3 w-3" />
-                              {r.forks}
-                            </span>
-                            {r.updatedAt && <span>updated {formatMonthYear(r.updatedAt)}</span>}
-                          </div>
-                        </a>
-                      </motion.li>
-                    ))}
-                  </motion.ul>
+                  </div>
                 </MotionWrapper>
               )}
+
+              <ActivityRhythm weeks={data.weeks} />
+            </div>
+
+            <PinnedRepos pinnedRepos={data.pinnedRepos} />
 
             <MotionWrapper delay={0.33} className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
@@ -956,24 +344,6 @@ export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPa
                 {refreshing ? "Refreshing" : "Refresh"}
               </button>
             </MotionWrapper>
-
-            {isClient &&
-              createPortal(
-                <div
-                  ref={tooltipRef}
-                  className="fixed z-50 pointer-events-none opacity-0"
-                  style={{ opacity: 0 }}
-                >
-                  <div className="bg-background border border-border shadow-sm rounded px-2 py-1 text-center whitespace-nowrap">
-                    <div
-                      ref={tooltipPrimaryRef}
-                      className="text-[11px] font-mono text-foreground tabular-nums"
-                    />
-                    <div ref={tooltipSecondaryRef} className="text-[10px] text-muted-foreground" />
-                  </div>
-                </div>,
-                document.body
-              )}
           </>
         )}
       </div>
