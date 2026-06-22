@@ -48,7 +48,24 @@ export const experiences: Experience[] = [
   }
 ];
 
-export const projects = [
+interface Project {
+  slug: string;
+  kicker: string;
+  name: string;
+  role: string;
+  date: string;
+  link?: string;
+  shortDescription: string;
+  fullDescription: string[];
+  tags: string[];
+  highlights: string[];
+  adminLink?: string;
+  repo?: string;
+  credentials?: { user: string; pass: string };
+  stats?: { endpoints: string; tables: string; year: string };
+}
+
+export const projects: Project[] = [
   {
     slug: "brewbank",
     kicker: "Key Project",
@@ -148,7 +165,17 @@ export const projects = [
   },
 ];
 
-export const education = {
+interface Education {
+  school: string;
+  degree: string;
+  year: string;
+  honors: string;
+  detail: string;
+  awards: string[];
+  shs: { school: string; strand: string; year: string };
+}
+
+export const education: Education = {
   school: "Centro Escolar University Malolos",
   degree: "Bachelor of Science in Information Technology",
   year: "2021 — 2025",
@@ -170,7 +197,14 @@ export const education = {
   },
 };
 
-export const certifications = [
+interface Certification {
+  name: string;
+  issuer: string;
+  date: string;
+  credential?: string;
+}
+
+export const certifications: Certification[] = [
   {
     name: "Oracle Cloud 2025 Certified Developer Professional",
     issuer: "Oracle University",
@@ -211,7 +245,16 @@ export const certifications = [
 ];
 
 
-export const skills = {
+interface SkillSet {
+  Backend: string[];
+  Databases: string[];
+  Frontend: string[];
+  "DevOps & Tools": string[];
+  Languages: string[];
+  [key: string]: string[];
+}
+
+export const skills: SkillSet = {
   Backend: ["ASP.NET Core (C#)", ".NET Core", "Node.js", "Express.js", "REST APIs", "Microservices", "gRPC", "MVC"],
   Databases: ["PostgreSQL", "MariaDB", "MySQL", "MS SQL", "Redis"],
   Frontend: ["React", "Next.js", "Tailwind CSS", "Bootstrap", "HTML5", "CSS3"],
