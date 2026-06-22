@@ -276,6 +276,22 @@ body::before {
   animation: conveyor 35s linear infinite;
 }
 
+/* Off-screen performance: the skills conveyor (`.animate-conveyor`) runs
+   continuously even when its section is scrolled out of view. Rather than
+   add a client component + IntersectionObserver (which would have to be
+   mounted from a file we don't own), use `content-visibility: auto` on the
+   conveyor's viewport container so the browser skips rendering work while
+   it is off-screen. `:has()` targets exactly the overflow-hidden wrapper
+   around the translating track (see components/sections/skills.tsx — the
+   `.animate-conveyor` div is a direct child of that wrapper).
+   `contain-intrinsic-size` reserves a stable height so scrollbar layout
+   doesn't shift when the section scrolls back into view. The animation is
+   kept; content-visibility pauses off-screen rendering naturally. */
+:has(> .animate-conveyor) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-conveyor {
     animation: none;
@@ -319,5 +335,79 @@ body,
   .bg-card,
   .bg-popover {
     transition-duration: 0ms;
+  }
+}
+
+/* Skip-to-content link: visually hidden by default, revealed on focus.
+   Mirrors the `.sr-only` pattern but flips to a visible, high-contrast
+   chip when keyboard focus lands on it. Position fixed so it sits above
+   the sticky navbar (z-50) — z-index 100 keeps it on top. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-md);
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.18s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Print styles: hide chrome and decorative animation, expand content, and
+   force black-on-white text for legibility on paper. Targets the always-
+   present navbar (header), footer, decorative layers (paper grain, section
+   numerals, conveyor, accent rules, corner brackets), and any Radix
+   portal overlays (command palette / dialogs) that happen to be mounted.
+   Spotlight and CommandPalette are conditionally mounted and rarely present
+   during print, but the fixed-position reset covers them if they are. */
+@media print {
+  /* Hide navigation and footer chrome. */
+  header,
+  footer,
+  .skip-link,
+  [data-radix-popper-content-wrapper],
+  [data-radix-overlay],
+  [role="dialog"] {
+    display: none !important;
+  }
+  /* Hide decorative / animated layers that add no print value. */
+  body::before,
+  .section-number,
+  .animate-conveyor,
+  .corner-bracket,
+  .accent-rule {
+    display: none !important;
+  }
+  /* Black on white, full width, no shadows. */
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  * {
+    animation: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  /* Neutralize fixed/sticky positioning that breaks print pagination. */
+  .sticky,
+  .fixed {
+    position: static !important;
+  }
+  /* Expand the main content column to the full page width. */
+  main,
+  .mx-auto {
+    max-width: 100% !important;
   }
 }

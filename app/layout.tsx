@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ClientGlobals } from "@/components/client-globals";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -68,11 +70,29 @@ export default function RootLayout({
   return (
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans">
+        {/* Skip-to-content link: visually hidden until focused (see .skip-link
+            in globals.css). First child of <body> so it is the first tab stop. */}
+        <a href="#main" className="skip-link">Skip to content</a>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
           <ClientGlobals />
-          {children}
+          {/*
+            id="main" is the skip-link target. The <main> element itself lives
+            in each page (app/page.tsx, app/not-found.tsx, app/error.tsx) which
+            are not owned by this file, so we wrap {children} with a
+            focusable wrapper as the skip target (display: contents preserves
+            the body's flex-column layout — the wrapper contributes no box).
+          */}
+          <div id="main" tabIndex={-1} className="contents">
+            {children}
+          </div>
           <Toaster position="bottom-right" richColors />
         </ThemeProvider>
+        {/* Vercel Web Analytics + Speed Insights. In production these inject
+            same-origin scripts under /_vercel/... and beacon to same-origin,
+            so the existing CSP (script-src 'self' 'unsafe-inline',
+            connect-src 'self') needs no changes. Does not track in dev. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

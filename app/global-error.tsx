@@ -20,6 +20,21 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("Global error:", error.message, "digest:", error.digest);
+
+    // Forward the digest to the server endpoint so it lands in the platform
+    // runtime logs (see app/api/error/route.ts). Fire-and-forget; a failure
+    // here must never break the error UI, so swallow rejections. global-error
+    // replaces the root layout, so the fetch path is the same origin-relative
+    // "/api/error".
+    if (error.digest) {
+      void fetch("/api/error", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ digest: error.digest, message: error.message }),
+      }).catch(() => {
+        /* network failure — nothing to do, error UI still renders */
+      });
+    }
   }, [error]);
 
   return (
