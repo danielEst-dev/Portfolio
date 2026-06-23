@@ -33,14 +33,16 @@ const nextConfig: NextConfig = {
     // Allow next/image to optimize the GitHub avatar served from
     // avatars.githubusercontent.com. Shape per the Next.js 16 image guide
     // (node_modules/next/dist/docs/01-app/01-getting-started/12-images.md).
-    // The CSP img-src already permits this host.
+    // The CSP img-src already permits this host. NOTE: `search` is intentionally
+    // OMITTED — the avatar URL carries a query string (`?s=80&v=4`), and setting
+    // `search: ""` (as the docs' query-less S3 example does) makes the matcher
+    // reject it (match-remote-pattern.js: `search !== url.search`).
     remotePatterns: [
       {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
         port: "",
         pathname: "/**",
-        search: "",
       },
     ],
   },
