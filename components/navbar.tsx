@@ -108,9 +108,11 @@ export function Navbar() {
 
   return (
     <motion.header
-      initial={reduce ? false : { y: -16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={reduce ? { duration: 0 } : { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+      // No entrance animation: <Navbar> is rendered per-page (not in the
+      // persistent layout), so a mount entrance would re-play on every
+      // navigation. Render in place instantly instead. The scroll-aware
+      // background/border transition below (CSS) and the `site-header`
+      // view-transition pin are unaffected.
       className={`sticky top-0 z-50 w-full backdrop-blur-2xl transition-[background-color,border-color] duration-[800ms] ${
         scrolled
           ? "border-b border-border/40 bg-background/40 backdrop-saturate-200 backdrop-contrast-105 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),inset_0_2px_2px_-1px_rgba(255,90,90,0.06),inset_0_-2px_2px_-1px_rgba(90,170,255,0.06)]"
