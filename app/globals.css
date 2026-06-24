@@ -139,6 +139,20 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+  /* Suppress the visible focus ring on touch-primary devices. Programmatic
+     focus() still runs (keyboard / screen reader nav unaffected), but no
+     outline paints when the device has no hover capability. The active-link
+     border-l-accent + aria-current="page" carry the selection state instead.
+     Real mobile browsers leave :focus-visible stuck after a tap — desktop
+     device emulation doesn't model this, which is why the box only shows on
+     real phones. */
+  @media (hover: none) and (pointer: coarse) {
+    a:focus-visible,
+    button:focus-visible,
+    [role="option"]:focus-visible {
+      outline: none;
+    }
+  }
 }
 
 /* Subtle paper grain overlay */
