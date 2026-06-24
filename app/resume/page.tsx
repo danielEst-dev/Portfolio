@@ -50,14 +50,17 @@ export default function ResumePage() {
                     {personalInfo.name}
                   </h1>
                 </div>
-                <Link
+                {/* Plain <a>, not next/link: /resume.pdf is a static asset in
+                    public/, not a route. next/link would prefetch its RSC
+                    payload (/resume.pdf?_rsc=…) and 404. */}
+                <a
                   href="/resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 border border-foreground text-sm font-medium text-foreground hover:bg-foreground hover:text-background transition-colors"
                 >
                   <Download className="h-4 w-4" /> Download PDF
-                </Link>
+                </a>
               </div>
               <p className="text-muted-foreground leading-relaxed max-w-2xl">
                 {personalInfo.summary}
