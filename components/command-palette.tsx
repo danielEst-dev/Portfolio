@@ -238,7 +238,7 @@ export function CommandPalette() {
             aria-controls={LISTBOX_ID}
             aria-autocomplete="list"
             aria-activedescendant={activeDescendantId}
-            className="h-auto flex-1 border-0 bg-transparent p-0 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+            className="h-auto flex-1 border-0 bg-transparent p-0 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
             autoFocus
           />
           <kbd className="hidden rounded border border-border bg-secondary px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground sm:inline-block">
@@ -275,6 +275,7 @@ export function CommandPalette() {
                       key={item.id}
                       id={`${LISTBOX_ID}-option-${item.id}`}
                       role="option"
+                      tabIndex={-1}
                       aria-selected={isSelected}
                       onMouseEnter={() => setSelectedIndex(index)}
                       onClick={() => {

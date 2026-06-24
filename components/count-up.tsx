@@ -58,7 +58,7 @@ export function CountUp({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !started) {
+        if (entry?.isIntersecting && !started) {
           setStarted(true);
           observer.disconnect();
         }

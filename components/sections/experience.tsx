@@ -38,12 +38,12 @@ export function Experience() {
                 {exp.muted ? (
                   /* Demoted entry — quiet single line, no expand */
                   <div className="py-4 border-b border-border">
-                    <p className="text-sm leading-relaxed text-muted-foreground/55">
-                      <span className="text-muted-foreground/75">{exp.role}</span>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      <span className="text-muted-foreground">{exp.role}</span>
                       <span className="mx-1.5 text-border">—</span>
                       <span>{exp.company}</span>
                       <span className="mx-1.5 text-border">·</span>
-                      <span className="text-muted-foreground/40">{exp.date}</span>
+                      <span className="text-muted-foreground">{exp.date}</span>
                     </p>
                   </div>
                 ) : (
@@ -68,7 +68,7 @@ export function Experience() {
                       <span
                         className={`font-mono text-[10px] tracking-[0.06em] pt-0.5 select-none
                                     transition-colors duration-200
-                                    ${isOpen ? "text-accent" : "text-muted-foreground/40"}`}
+                                    ${isOpen ? "text-accent" : "text-muted-foreground"}`}
                       >
                         {numeral}
                       </span>
@@ -85,19 +85,19 @@ export function Experience() {
                           >
                             {exp.role}
                           </h3>
-                          <span className="hidden md:block font-mono text-xs tracking-[0.04em] text-muted-foreground/50 md:ml-auto whitespace-nowrap">
+                          <span className="hidden md:block font-mono text-xs tracking-[0.04em] text-muted-foreground md:ml-auto whitespace-nowrap">
                             {exp.date}
                           </span>
                         </div>
-                        <p className="text-base text-muted-foreground/70 mt-1 leading-snug">
-                          <span className="text-muted-foreground/45">at</span>{" "}
+                        <p className="text-base text-muted-foreground mt-1 leading-snug">
+                          <span className="text-muted-foreground">at</span>{" "}
                           {exp.company}
                         </p>
                         {/* Date — below the company line on mobile. On desktop the
                             date sits top-right on the role row above (hidden
                             md:block), so this copy is mobile-only (display:none
                             removes it from the a11y tree at md and up). */}
-                        <span className="block md:hidden mt-1 font-mono text-xs tracking-[0.04em] text-muted-foreground/50 whitespace-nowrap">
+                        <span className="block md:hidden mt-1 font-mono text-xs tracking-[0.04em] text-muted-foreground whitespace-nowrap">
                           {exp.date}
                         </span>
                         {exp.stack && exp.stack.length > 0 && (
@@ -110,7 +110,7 @@ export function Experience() {
                             {exp.stack.map((tech) => (
                               <span
                                 key={tech}
-                                className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground/75 border border-border px-2 py-1"
+                                className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground border border-border px-2 py-1"
                               >
                                 {tech}
                               </span>

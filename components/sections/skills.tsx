@@ -84,7 +84,7 @@ function SkillRow({
               {item}
             </span>
             {itemIndex < items.length - 1 && (
-              <span className="text-muted-foreground/40 mx-1.5 select-none">·</span>
+              <span className="text-muted-foreground mx-1.5 select-none">·</span>
             )}
           </motion.span>
         ))}

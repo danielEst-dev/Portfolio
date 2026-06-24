@@ -193,7 +193,7 @@ export default function ResumePage() {
                         href={cert.credential}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-accent transition-colors ml-4"
+                        className="inline-flex size-6 items-center justify-center text-muted-foreground hover:text-accent transition-colors ml-4"
                         aria-label="View credential"
                       >
                         <ArrowUpRight className="h-4 w-4" />

@@ -148,7 +148,7 @@ function CopyEmailButton({ email }: { email: string }) {
           /* clipboard unavailable — no-op */
         }
       }}
-      className="shrink-0 text-muted-foreground hover:text-accent transition-colors"
+      className="inline-flex size-6 items-center justify-center shrink-0 text-muted-foreground hover:text-accent transition-colors"
     >
       {copied ? <Check className="h-4 w-4 text-accent" /> : <Copy className="h-4 w-4" />}
     </button>

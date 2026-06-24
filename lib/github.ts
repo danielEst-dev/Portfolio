@@ -205,9 +205,9 @@ function computeStreaks(days: { contributionCount: number }[]): {
   }
 
   let i = days.length - 1;
-  if (i >= 0 && days[i].contributionCount === 0) i -= 1;
+  if (i >= 0 && days[i]?.contributionCount === 0) i -= 1;
   let current = 0;
-  while (i >= 0 && days[i].contributionCount > 0) {
+  while (i >= 0 && (days[i]?.contributionCount ?? 0) > 0) {
     current += 1;
     i -= 1;
   }
@@ -310,6 +310,10 @@ export async function getGitHubActivity(): Promise<GitHubActivityPayload> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ query: QUERY }),
+      // Guard against a hanging GitHub endpoint: abort the upstream fetch
+      // after 10s so a slow or black-holed API can't pin the request. The
+      // cache (next.revalidate) still serves the last-good payload on timeout.
+      signal: AbortSignal.timeout(10_000),
       // Cache the GitHub response for 6h. Next serves the cached result on
       // subsequent requests and revalidates in the background; if the
       // revalidation fetch fails it keeps serving the last-good response

@@ -130,6 +130,15 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-sans font-medium tracking-tight;
   }
+  /* Visible keyboard focus for links, buttons, and listbox options. Inputs keep
+     their own border-accent focus treatment (see their focus-visible classes),
+     so they're excluded to avoid doubling up. */
+  a:focus-visible,
+  button:focus-visible,
+  [role="option"]:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
 /* Subtle paper grain overlay */

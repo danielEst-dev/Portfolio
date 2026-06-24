@@ -250,6 +250,32 @@ export function Navbar() {
           </nav>
         </div>
       )}
+
+      {/* No-JS fallback: the menu above is JS-toggled, so without JS the mobile
+          nav links vanish. Render them unconditionally inside <noscript> so
+          JS-disabled visitors can still navigate. */}
+      <noscript>
+        <nav
+          aria-label="Mobile primary (no-JS fallback)"
+          className="md:hidden border-t border-border/40 bg-background"
+        >
+          <div className="mx-auto max-w-6xl px-6 py-4 flex flex-col gap-4">
+            {navLinks.map((link) => {
+              const isActive = isActiveRoute(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`text-sm font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      </noscript>
     </motion.header>
   );
 }

@@ -73,6 +73,20 @@ export default function RootLayout({
         {/* Skip-to-content link: visually hidden until focused (see .skip-link
             in globals.css). First child of <body> so it is the first tab stop. */}
         <a href="#main" className="skip-link">Skip to content</a>
+        <noscript>
+          <style>{`
+            /* Reveal framer-motion elements that ship hidden (opacity:0)
+               before hydration, so no-JS visitors see the real content
+               instead of an empty shell. Scoped to multi-property inline
+               styles (opacity:0;) so faint decorative numerals (opacity:0.01)
+               and empty graph cells (opacity:0 alone) are left untouched. */
+            [style*="opacity:0;"] {
+              opacity: 1 !important;
+              transform: none !important;
+              -webkit-transform: none !important;
+            }
+          `}</style>
+        </noscript>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
           <ClientGlobals />
           {/*

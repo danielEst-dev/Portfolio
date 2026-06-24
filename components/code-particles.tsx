@@ -32,7 +32,7 @@ function createParticle(w: number, h: number): Particle {
     // Very slow drift
     vx: (Math.random() - 0.5) * 0.12,
     vy: (Math.random() - 0.5) * 0.08 + 0.04, // slight downward bias
-    token: TOKENS[Math.floor(Math.random() * TOKENS.length)],
+    token: TOKENS[Math.floor(Math.random() * TOKENS.length)]!,
     alpha: Math.random() * 0.035 + 0.015, // 0.015 – 0.05
     size,
     // Precomputed once so the rAF draw loop avoids a per-frame font-string

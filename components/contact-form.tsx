@@ -46,6 +46,9 @@ export function ContactForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        // Abort the request if the network or server stalls, so the user
+        // isn't left waiting on a spinner forever.
+        signal: AbortSignal.timeout(10_000),
       });
 
       const result = await response.json();
@@ -59,8 +62,11 @@ export function ContactForm() {
         toast.error(message);
         setStatus({ kind: "error", message });
       }
-    } catch {
-      const message = "Something went wrong. Please try again later.";
+    } catch (err) {
+      const message =
+        err instanceof DOMException && err.name === "TimeoutError"
+          ? "The request timed out. Please try again."
+          : "Something went wrong. Please try again later.";
       toast.error(message);
       setStatus({ kind: "error", message });
     } finally {
@@ -184,6 +190,10 @@ export function ContactForm() {
           )}
         </Button>
       </div>
+      <p className="text-center text-[11px] text-muted-foreground pt-6">
+        Your message is emailed directly to me and not stored anywhere else. No
+        tracking or cookies are used.
+      </p>
     </form>
   );
 }

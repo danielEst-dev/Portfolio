@@ -47,7 +47,7 @@ function useNearViewport(rootMargin = "200px") {
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setNear(true);
           obs.disconnect();
         }

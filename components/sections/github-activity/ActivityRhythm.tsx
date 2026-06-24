@@ -72,8 +72,9 @@ function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
 
   // Longest gap: longest run of zero-contribution days. Drop the final day if
   // it's zero (today isn't over) so an in-progress day can't inflate the gap.
+  const lastDay = days[days.length - 1];
   const gapDays =
-    days.length && days[days.length - 1].count === 0 ? days.slice(0, -1) : days;
+    days.length && lastDay && lastDay.count === 0 ? days.slice(0, -1) : days;
   let gapRun = 0;
   let longestGap = 0;
   for (const d of gapDays) {
@@ -107,8 +108,9 @@ function computeActivityRhythm(weeks: ActivityData["weeks"]): ActivityRhythm {
     longestGap,
     avgPerActiveDay: activeDays > 0 ? Math.round((totalContribs / activeDays) * 10) / 10 : null,
     bestDay: bestDay && bestDay.count > 0 ? bestDay : null,
-    busiestWeekday: weekdaySums[topWeekday] > 0 ? WEEKDAY_NAMES[topWeekday] : null,
-    busiestMonth: monthSums[topMonth] > 0 ? MONTH_NAMES[topMonth] : null,
+    busiestWeekday:
+      weekdaySums[topWeekday]! > 0 ? (WEEKDAY_NAMES[topWeekday] ?? null) : null,
+    busiestMonth: monthSums[topMonth]! > 0 ? (MONTH_NAMES[topMonth] ?? null) : null,
     momentum,
     recentSeries,
   };
@@ -128,7 +130,7 @@ export function ActivityRhythm({ weeks }: { weeks: ActivityData["weeks"] }) {
     const el = rhythmPanelRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => setRhythmInView(entry.isIntersecting),
+      ([entry]) => setRhythmInView(entry?.isIntersecting ?? false),
       { rootMargin: "-80px" }
     );
     obs.observe(el);
