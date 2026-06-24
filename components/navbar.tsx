@@ -5,13 +5,15 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { navLinks, personalInfo } from "@/lib/data";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Menu, X, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useIsMac } from "@/lib/hooks";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 // Shared easing used across the site's motion (hero entrance, accent rule,
 // link underline). Reusing it keeps the nav's motion in the same dialect.
 const EASE = "cubic-bezier(0.25, 0.1, 0.25, 1)";
+// Same easing as a cubic-bezier array for framer-motion's typed `ease` field.
+const EASE_BEZIER = [0.25, 0.1, 0.25, 1] as const;
 
 export function Navbar() {
   const pathname = usePathname();
@@ -23,6 +25,8 @@ export function Navbar() {
   const isMac = useIsMac();
   const reduce = useReducedMotion();
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   // Scroll-aware header: borderless + transparent at the very top, hairline
@@ -34,7 +38,9 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close on Escape + lock body scroll while the mobile menu is open.
+  // While the mobile menu is open: lock body scroll, close on Escape, trap
+  // Tab within the panel, and move focus into the first link so keyboard and
+  // screen-reader users land inside the menu instead of on the page behind it.
   useEffect(() => {
     if (!open) return;
 
@@ -42,16 +48,59 @@ export function Navbar() {
       if (e.key === "Escape") {
         setOpen(false);
         toggleRef.current?.focus();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+      const menu = menuRef.current;
+      if (!menu) return;
+      const focusables = Array.from(
+        menu.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>(
+          'a[href], button:not([disabled])'
+        )
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (!first || !last) return;
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !menu.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !menu.contains(active)) {
+        e.preventDefault();
+        first.focus();
       }
     };
 
     document.addEventListener("keydown", onKeyDown);
+
+    // Close when a pointer lands outside the menu and outside the toggle.
+    // The toggle is excluded so its own onClick can flip state without the
+    // outside-listener racing it closed.
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (menuRef.current?.contains(target)) return;
+      if (toggleRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
+    // Focus the first link once the panel has mounted. rAF waits a frame so
+    // the ref is attached after AnimatePresence mounts the panel.
+    const id = requestAnimationFrame(() => firstLinkRef.current?.focus());
+
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
       document.body.style.overflow = previousOverflow;
+      cancelAnimationFrame(id);
     };
   }, [open]);
 
@@ -212,44 +261,85 @@ export function Navbar() {
             <button
               ref={toggleRef}
               onClick={() => setOpen(!open)}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+              data-open={open}
+              className="hamburger flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Toggle menu"
               aria-expanded={open}
               aria-controls="mobile-menu"
             >
-              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <svg className="hamburger__icon" viewBox="0 0 100 100" aria-hidden="true">
+                <path
+                  className="line line1"
+                  fill="none"
+                  d="M 20,29.000046 H 80.000231 C 80.000231,29.000046 94.498839,28.817352 94.532987,66.711331 94.543142,77.980673 90.966081,81.670246 85.259173,81.668997 79.552261,81.667751 75.000211,74.999942 75.000211,74.999942 L 25.000021,25.000058"
+                />
+                <path className="line line2" fill="none" d="M 20,50 H 80" />
+                <path
+                  className="line line3"
+                  fill="none"
+                  d="M 20,70.999954 H 80.000231 C 80.000231,70.999954 94.498839,71.182648 94.532987,33.288669 94.543142,22.019327 90.966081,18.329754 85.259173,18.331003 79.552261,18.332249 75.000211,25.000058 75.000211,25.000058 L 25.000021,74.999942"
+                />
+              </svg>
             </button>
           </div>
         </div>
       </div>
 
-      {open && (
-        <div
-          id="mobile-menu"
-          className="md:hidden border-t border-border/40 bg-background"
-        >
-          <nav
-            aria-label="Mobile primary"
-            className="mx-auto max-w-6xl px-6 py-4 flex flex-col gap-4"
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id="mobile-menu"
+            ref={menuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            className="md:hidden absolute left-0 right-0 top-full overflow-hidden border-t border-b border-border/40 bg-background"
+            // Mask reveal: clip-path "unrolls" top-down. Same 450ms duration +
+            // cubic-bezier as the hamburger icon morph so the two motions read
+            // as one composed action. Avoids animating `height` (layout-bound,
+            // main-thread) in favor of a compositor-friendly transform.
+            initial={reduce ? { opacity: 0 } : { opacity: 0, clipPath: "inset(0 0 100% 0)" }}
+            animate={
+              reduce
+                ? { opacity: 1, clipPath: "inset(0 0 0% 0)" }
+                : { opacity: 1, clipPath: "inset(0 0 0% 0)" }
+            }
+            exit={
+              reduce
+                ? { opacity: 0 }
+                : { opacity: 0, clipPath: "inset(0 0 100% 0)" }
+            }
+            transition={{ duration: reduce ? 0 : 0.45, ease: EASE_BEZIER }}
+            style={{ willChange: "clip-path, opacity" }}
           >
-            {navLinks.map((link) => {
-              const isActive = isActiveRoute(link.href);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  transitionTypes={["nav-forward"]}
-                  aria-current={isActive ? "page" : undefined}
-                  onClick={() => setOpen(false)}
-                  className={`text-sm font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      )}
+            <nav
+              aria-label="Mobile primary"
+              className="mx-auto max-w-6xl px-6 py-3 flex flex-col"
+            >
+              {navLinks.map((link, i) => {
+                const isActive = isActiveRoute(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    ref={i === 0 ? firstLinkRef : undefined}
+                    href={link.href}
+                    transitionTypes={["nav-forward"]}
+                    aria-current={isActive ? "page" : undefined}
+                    onClick={() => setOpen(false)}
+                    className={`flex min-h-[44px] items-center border-b border-border/30 border-l-2 py-2 pl-3 text-sm font-medium transition-colors last:border-b-0 ${
+                      isActive
+                        ? "border-l-accent text-foreground"
+                        : "border-l-transparent text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* No-JS fallback: the menu above is JS-toggled, so without JS the mobile
           nav links vanish. Render them unconditionally inside <noscript> so
