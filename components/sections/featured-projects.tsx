@@ -84,7 +84,7 @@ export function FeaturedProjects() {
 
   return (
     <section id="projects" className="py-20 md:py-28 bg-secondary/30 relative overflow-hidden">
-      <SectionNumber className="top-1/2 right-0 translate-x-1/3 -translate-y-1/2">03</SectionNumber>
+      <SectionNumber index={3} />
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Selected Work" number="03" />

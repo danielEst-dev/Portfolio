@@ -159,7 +159,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden">
       <CodeParticles />
-      <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">01</SectionNumber>
+      <SectionNumber index={1} />
       {/* min-h pushes the contact row to the bottom of the viewport for the
           cover-style asymmetry; content taller than the min-height just flows. */}
       <div className="mx-auto max-w-6xl px-6 lg:px-8 pt-8 md:pt-12 lg:pt-12 pb-14 md:pb-20 lg:pb-20 relative z-10 flex flex-col sm:min-h-[calc(100vh-4rem)]">

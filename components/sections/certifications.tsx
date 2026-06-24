@@ -90,7 +90,7 @@ export function Certifications() {
 
   return (
     <section className="pt-20 md:pt-28 pb-12 md:pb-16 bg-secondary/30 relative overflow-hidden">
-      <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">07</SectionNumber>
+      <SectionNumber index={7} />
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Certifications" number="07" />

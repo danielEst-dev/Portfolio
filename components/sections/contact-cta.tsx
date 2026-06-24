@@ -8,7 +8,7 @@ import { MagneticLink } from "@/components/magnetic-link";
 export function ContactCta() {
   return (
     <section id="contact" className="py-20 md:py-28 bg-secondary/30 relative overflow-hidden">
-      <SectionNumber className="top-1/2 right-0 translate-x-1/3 -translate-y-1/2">09</SectionNumber>
+      <SectionNumber index={9} />
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Get in Touch" number="09" />

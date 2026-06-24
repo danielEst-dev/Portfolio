@@ -20,7 +20,7 @@ const homeSchool = education.school.replace(/ Malolos$/, "");
 export function Education() {
   return (
     <section id="education" className="py-20 md:py-28 bg-secondary/30 relative overflow-hidden">
-      <SectionNumber className="top-0 right-0 translate-x-1/4 -translate-y-1/4">05</SectionNumber>
+      <SectionNumber index={5} />
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Education" number="05" />

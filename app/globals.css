@@ -223,12 +223,12 @@ body::before {
 /* Large background numerals */
 .section-number {
   position: absolute;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: clamp(6rem, 15vw, 12rem);
   font-weight: 500;
   line-height: 1;
   color: var(--foreground);
-  opacity: 0.03;
+  opacity: 0.02;
   pointer-events: none;
   user-select: none;
   z-index: 0;

@@ -203,7 +203,7 @@ export function GitHubActivity({ initialData }: { initialData?: GitHubActivityPa
 
   return (
     <section className="pt-12 md:pt-16 pb-20 md:pb-28 relative overflow-hidden">
-      <SectionNumber className="bottom-0 left-0 -translate-x-1/4 translate-y-1/4">08</SectionNumber>
+      <SectionNumber index={8} />
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="GitHub Activity" number="08" />

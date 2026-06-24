@@ -98,7 +98,7 @@ export function Skills() {
 
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
-      <SectionNumber className="top-0 left-0 -translate-x-1/4 -translate-y-1/4">06</SectionNumber>
+      <SectionNumber index={6} />
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="Technical Skills" number="06" />

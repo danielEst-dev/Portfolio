@@ -24,7 +24,7 @@ const statItem = {
 export function About() {
   return (
     <section id="about" className="py-20 md:py-28 relative overflow-hidden">
-      <SectionNumber className="bottom-0 left-0 -translate-x-1/4 translate-y-1/4">02</SectionNumber>
+      <SectionNumber index={2} />
       <div className="mx-auto max-w-6xl px-6 lg:px-8 relative z-10">
         <MotionWrapper>
           <SectionLabel label="About" number="02" />
