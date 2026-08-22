@@ -108,6 +108,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               <p className="text-sm text-muted-foreground">
                 {project.role} · {project.date}
               </p>
+              {project.status && (
+                <p className="mt-3 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-accent">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+                  {project.status}
+                </p>
+              )}
             </header>
 
             <div className="grid lg:grid-cols-[1fr_260px] gap-12 lg:gap-16">
@@ -137,6 +143,121 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </ul>
                 </section>
 
+                {project.architecture && (
+                  <section className="mb-12">
+                    <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                      Architecture
+                    </h2>
+                    <div className="border-t border-border">
+                      {project.architecture.map((row) => (
+                        <div
+                          key={row.layer}
+                          className="grid md:grid-cols-[130px_1fr] gap-1.5 md:gap-6 py-5 border-b border-border"
+                        >
+                          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground md:pt-1">
+                            {row.layer}
+                          </span>
+                          <div>
+                            <p className="text-sm font-medium text-foreground mb-1.5">{row.choice}</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{row.why}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {project.deepDives && (
+                  <section className="mb-12">
+                    <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                      Engineering Deep Dives
+                    </h2>
+                    {/* Hairline-joined stack: one border around the group, 1px gaps between. */}
+                    <div className="grid gap-px bg-border border border-border">
+                      {project.deepDives.map((dive) => (
+                        <div key={dive.title} className="bg-background p-5 md:p-6">
+                          <h3 className="text-base md:text-lg font-medium text-foreground mb-4">
+                            {dive.title}
+                          </h3>
+                          <div className="space-y-4">
+                            <div>
+                              <p className="font-mono text-[10px] uppercase tracking-wider text-accent mb-1.5">
+                                Problem
+                              </p>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{dive.problem}</p>
+                            </div>
+                            <div>
+                              <p className="font-mono text-[10px] uppercase tracking-wider text-accent mb-1.5">
+                                Approach
+                              </p>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{dive.approach}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {project.decisions && (
+                  <section className="mb-12">
+                    <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                      Decisions &amp; Trade-offs
+                    </h2>
+                    <div className="space-y-6">
+                      {project.decisions.map((item) => (
+                        <div key={item.decision} className="border-l-2 border-accent/50 pl-5">
+                          <p className="text-sm font-medium text-foreground mb-1.5">{item.decision}</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{item.why}</p>
+                          {item.rejected && (
+                            <p className="mt-2.5 text-sm text-muted-foreground/80 leading-relaxed">
+                              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mr-2">
+                                Instead of
+                              </span>
+                              {item.rejected}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {project.quality && (
+                  <section className="mb-12">
+                    <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-4">
+                      Testing &amp; Quality
+                    </h2>
+                    <ul className="space-y-3">
+                      {project.quality.map((line, i) => (
+                        <li key={i} className="flex gap-4 text-sm text-muted-foreground leading-relaxed">
+                          <span className="text-accent mt-1.5">—</span>
+                          <span>{line}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+                {project.aiWorkflow && (
+                  <section className="mb-12 p-5 md:p-6 border border-border bg-secondary/30">
+                    <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
+                      AI-Assisted Workflow
+                    </h2>
+                    <p className="text-sm text-foreground leading-relaxed mb-4">
+                      {project.aiWorkflow.summary}
+                    </p>
+                    <ul className="space-y-2.5">
+                      {project.aiWorkflow.points.map((point, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-muted-foreground leading-relaxed">
+                          <span className="text-accent mt-1.5">—</span>
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
                 {project.credentials && (
                   <section className="mb-12 p-5 border border-border bg-secondary/30">
                     <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
@@ -156,7 +277,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 )}
               </div>
 
-              <aside className="space-y-8">
+              <aside className="space-y-8 lg:sticky lg:top-24 lg:self-start">
                 <div>
                   <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
                     Stack
@@ -179,16 +300,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       Key Stats
                     </h2>
                     <div className="space-y-3">
-                      {Object.entries(project.stats).map(([key, value]) => (
-                        <div key={key} className="flex justify-between items-baseline border-b border-border/60 pb-2">
-                          <span className="text-xs text-muted-foreground capitalize">{key}</span>
-                          <span className="text-sm font-medium">{value}</span>
+                      {project.stats.map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="flex justify-between items-baseline gap-3 border-b border-border/60 pb-2"
+                        >
+                          <span className="text-xs text-muted-foreground">{stat.label}</span>
+                          <span className="text-sm font-medium text-right">{stat.value}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
+                {(project.link || project.adminLink || project.repo || project.linksNote) && (
                 <div>
                   <h2 className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground mb-3">
                     Links
@@ -224,8 +349,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                         <Github className="h-4 w-4" /> View Code <ArrowUpRight className="h-3 w-3" />
                       </Link>
                     )}
+                    {project.linksNote && (
+                      <p className="text-sm text-muted-foreground leading-relaxed">{project.linksNote}</p>
+                    )}
                   </div>
                 </div>
+                )}
               </aside>
             </div>
 
