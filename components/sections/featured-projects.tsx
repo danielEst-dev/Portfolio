@@ -55,7 +55,7 @@ function FeaturedCard({
               {project.shortDescription}
             </p>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-end justify-between">
             <div className="flex flex-wrap gap-2">
               {project.tags.map((tag, i) => (
                 <span
@@ -71,7 +71,7 @@ function FeaturedCard({
                 </span>
               )}
             </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground arrow-nudge group-hover:[animation-play-state:paused] group-hover:text-accent group-data-[active=true]:[animation-play-state:paused] group-data-[active=true]:text-accent transition-all" />
+            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground arrow-nudge group-hover:[animation-play-state:paused] group-hover:text-accent group-data-[active=true]:[animation-play-state:paused] group-data-[active=true]:text-accent transition-all" />
           </div>
         </div>
       </Link>
